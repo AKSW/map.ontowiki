@@ -23,8 +23,13 @@ class MinimapModule extends OntoWiki_Module
  */
     }
 
+    public function getTitle()
+    {
+        return 'Map';
+    }
+
     public function getContents()
-    {        
+    {
 //        if(isset($this->_owApp->session->instances)) {
 			$this->_owApp->logger->debug('MimimapModule/getContents: lastRoute = "' . $this->_owApp->lastRoute . '".');
 			if ($this->_owApp->lastRoute == 'properties') {

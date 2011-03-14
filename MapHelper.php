@@ -17,157 +17,194 @@ require_once 'OntoWiki/Component/Helper.php';
 class MapHelper extends OntoWiki_Component_Helper
 {
 
-    /**
-     * Object holding the Instances with direct geo properties (e.g.: geo:long, geo:lat)
-     * and the other one with indirect geo properties (e.g.: foaf:based_near)
-     */
-    private $dirInstances = null;
-    private $indInstances = null;
-    private $listHelper = null;
+	/**
+	 * Object holding the Instances with direct geo properties (e.g.: geo:long, geo:lat)
+	 * and the other one with indirect geo properties (e.g.: foaf:based_near)
+	 */
+	private $dirInstances = null;
+	private $indInstances = null;
+	private $listHelper = null;
 
-    public function init()
-    {
-        $onSwitch = false;  // decide, if map should be on
+	public function init()
+	{
+		$onSwitch = false;  // decide, if map should be on
 
-        if (isset($this->_privateConfig->show->tab)){
-            if ($this->_privateConfig->show->tab == 'ever') {
-                $onSwitch = true;
-            } else if ($this->_privateConfig->show->tab == 'never') {
-                $onSwitch = false;
-            } else {
-                $onSwitch = $this->shouldShow();
-            }
-        } else {
-            $onSwitch = $this->shouldShow();
-        }
+		if (isset($this->_privateConfig->show->tab)){
+			if ($this->_privateConfig->show->tab == 'ever') {
+				$onSwitch = true;
+			} else if ($this->_privateConfig->show->tab == 'never') {
+				$onSwitch = false;
+			} else {
+				$onSwitch = $this->shouldShow();
+			}
+		} else {
+			$onSwitch = $this->shouldShow();
+		}
 
-        if ($onSwitch) {
-            // register new tab
-            require_once 'OntoWiki/Navigation.php';
+		if ($onSwitch) {
+			// register new tab
+			require_once 'OntoWiki/Navigation.php';
 
-            if (!OntoWiki_Navigation::isRegistered('map')) {
-                OntoWiki_Navigation::register('map', array(
+			if (!OntoWiki_Navigation::isRegistered('map')) {
+				OntoWiki_Navigation::register('map', array(
                             'controller' => 'map', 
                             'action'     => 'display', 
                             'name'       => 'Map', 
                             'priority'   => 20,
                             'active'     => false));
-            }
-        }
-    }
+			}
+		}
+	}
 
-    public function shouldShow () 
-    {
-    	
-    	if($this->listHelper == null) {
-    		$this->listHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('List');
-    	}
+	public function shouldShow ()
+	{
+			
+		if($this->listHelper == null) {
+			$this->listHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('List');
+		}
 
-        /*
-         * don't show on model, application, error, debug, module and index controller
-         */
-    	/**
-    	 * for debug output
-    	 * @var OntoWiki Instance of the App-Object
-    	 */
-    	$owApp = OntoWiki::getInstance();
-    	/*
-        $session = $owApp->session;
-        */
-        $front  = Zend_Controller_Front::getInstance();
+		/*
+		 * don't show on model, application, error, debug, module and index controller
+		 */
+		/**
+		 * for debug output
+		 * @var OntoWiki Instance of the App-Object
+		 */
+		$owApp = OntoWiki::getInstance();
+		/*
+		 $session = $owApp->session;
+		 */
+		$front  = Zend_Controller_Front::getInstance();
 
-        $listName = "instances";
-        if (!$front->getRequest()->isXmlHttpRequest() && $this->listHelper->listExists($listName)) {
-            $instances = $this->listHelper->getList($listName);
+		$listName = "instances";
 
-            $latProperties  = $this->_privateConfig->property->latitude->toArray();
-            $longProperties = $this->_privateConfig->property->longitude->toArray();
-            $latProperty    = $latProperties[0];
-            $longProperty   = $longProperties[0];
+		$latProperties  = $this->_privateConfig->property->latitude->toArray();
+		$longProperties = $this->_privateConfig->property->longitude->toArray();
+		$latProperty    = $latProperties[0];
+		$longProperty   = $longProperties[0];
 
-            $latVar         = new Erfurt_Sparql_Query2_Var('lat');
-            $longVar        = new Erfurt_Sparql_Query2_Var('long');
-            $lat2Var        = new Erfurt_Sparql_Query2_Var('lat2');
-            $long2Var       = new Erfurt_Sparql_Query2_Var('long2');
+		if ($this->_owApp->lastRoute == 'properties') {
+			//$this->_owApp->selectedResource;
 
-            if($this->dirInstances === null) {    
-                $this->dirInstances = clone $instances;
-            } else {
-                $owApp->logger->debug('MapHelper/shouldShow: this->dirInstances already set');
-                // don't load instances again
-            }
+			$dirQuery = '
+                SELECT ?lat ?long
+                WHERE {
+                    <' . $this->_owApp->selectedResource->getIri() . '> <' . $latProperty . '>  ?lat;
+                                                                        <' . $longProperty . '> ?long.
+        		}';
+			$indQuery = '
+                SELECT ?lat2 ?long2
+                WHERE {
+                    <' . $this->_owApp->selectedResource->getIri() . '> ?p ?o.
+                    ?o <' . $latProperty . '>  ?lat2;
+                       <' . $longProperty . '> ?long2.
+        		}';
+				
+			$owApp->logger->debug('MapHelper/shouldShow: sent "' . $dirQuery . '" to know if SpacialThings are available.');
+			$owApp->logger->debug('MapHelper/shouldShow: sent "' . $indQuery . '" to know if SpacialThings are available.');
 
-            if($this->indInstances === null) {    
-                $this->indInstances = clone $instances;
-            } else {
-                $owApp->logger->debug('MapHelper/shouldShow: this->indInstances already set');
-                // don't load instances again
-            }
+			/* get result of the query */
+			$dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
+			$indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
 
-            $this->dirInstances->setLimit(1);
-            $this->dirInstances->setOffset(0);
-            $this->indInstances->setLimit(1);
-            $this->indInstances->setOffset(0);
+			$owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
+			$owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
 
-            /**
-             * Direct Query, to check for direct geoproperties
-             */
-            $dirQuery  = $this->dirInstances->getResourceQuery();
-            $dirQuery->setQueryType(Erfurt_Sparql_Query2::typeSelect); /* would like to ask but ask lies */
-            $dirQuery->removeAllOptionals()->removeAllProjectionVars();
+			if ($dirResult OR $indResult) {
+				$result = true;
+			} else {
+				$result = false;
+			}
 
-            /**
-             * Indirect Query, to check for indirect geoproperties
-             */
-            $indQuery  = $this->indInstances->getResourceQuery();
-            $indQuery->setQueryType(Erfurt_Sparql_Query2::typeSelect); /* would like to ask but ask lies */
-            $indQuery->removeAllOptionals()->removeAllProjectionVars();
+			return $result;
+		} else if ($this->_owApp->lastRoute == 'instances') {
+			if (!$front->getRequest()->isXmlHttpRequest() && $this->listHelper->listExists($listName)) {
+				$instances = $this->listHelper->getList($listName);
 
-            $dirQuery->addProjectionVar($this->dirInstances->getResourceVar());
-            $dirQuery->addProjectionVar($latVar);
-            $dirQuery->addProjectionVar($longVar);
 
-            $indQuery->addProjectionVar($this->indInstances->getResourceVar());
-            $indQuery->addProjectionVar($lat2Var);
-            $indQuery->addProjectionVar($long2Var);
+				$latVar         = new Erfurt_Sparql_Query2_Var('lat');
+				$longVar        = new Erfurt_Sparql_Query2_Var('long');
+				$lat2Var        = new Erfurt_Sparql_Query2_Var('lat2');
+				$long2Var       = new Erfurt_Sparql_Query2_Var('long2');
 
-            $dirQuery->addTriple($this->dirInstances->getResourceVar(), $latProperty, $latVar);
-            $dirQuery->addTriple($this->dirInstances->getResourceVar(), $longProperty, $longVar);
+				if($this->dirInstances === null) {
+					$this->dirInstances = clone $instances;
+				} else {
+					$owApp->logger->debug('MapHelper/shouldShow: this->dirInstances already set');
+					// don't load instances again
+				}
 
-            $node     = new Erfurt_Sparql_Query2_Var('node'); // should be $node = new Erfurt_Sparql_Query2_BlankNode('bn'); but i heard this is not supported yet by zendb
-            $indQuery->addTriple($this->indInstances->getResourceVar(), new Erfurt_Sparql_Query2_Var('pred') , $node);
-            $indQuery->addTriple($node, $latProperty, $lat2Var);
-            $indQuery->addTriple($node, $longProperty, $long2Var);
+				if($this->indInstances === null) {
+					$this->indInstances = clone $instances;
+				} else {
+					$owApp->logger->debug('MapHelper/shouldShow: this->indInstances already set');
+					// don't load instances again
+				}
 
-            $owApp->logger->debug('MapHelper/shouldShow: sent "' . $dirQuery . '" to know if SpacialThings are available.');
-            $owApp->logger->debug('MapHelper/shouldShow: sent "' . $indQuery . '" to know if SpacialThings are available.');
+				$this->dirInstances->setLimit(1);
+				$this->dirInstances->setOffset(0);
+				$this->indInstances->setLimit(1);
+				$this->indInstances->setOffset(0);
 
-            /* get result of the query */
-            $dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
-            $indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
+				/**
+				 * Direct Query, to check for direct geoproperties
+				 */
+				$dirQuery  = $this->dirInstances->getResourceQuery();
+				$dirQuery->setQueryType(Erfurt_Sparql_Query2::typeSelect); /* would like to ask but ask lies */
+				$dirQuery->removeAllOptionals()->removeAllProjectionVars();
 
-            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
-            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
+				/**
+				 * Indirect Query, to check for indirect geoproperties
+				 */
+				$indQuery  = $this->indInstances->getResourceQuery();
+				$indQuery->setQueryType(Erfurt_Sparql_Query2::typeSelect); /* would like to ask but ask lies */
+				$indQuery->removeAllOptionals()->removeAllProjectionVars();
 
-            if ($dirResult OR $indResult) {
-                $result = true;
-            } else {
-                $result = false;
-            }
+				$dirQuery->addProjectionVar($this->dirInstances->getResourceVar());
+				$dirQuery->addProjectionVar($latVar);
+				$dirQuery->addProjectionVar($longVar);
 
-            return $result;
+				$indQuery->addProjectionVar($this->indInstances->getResourceVar());
+				$indQuery->addProjectionVar($lat2Var);
+				$indQuery->addProjectionVar($long2Var);
 
-        } else {
-            if($front->getRequest()->isXmlHttpRequest()) {
-                $owApp->logger->debug('MapHelper/shouldShow: xmlHttpRequest → no map.');
-            } else if(!$this->listHelper->listExists($listName)) {
-                $owApp->logger->debug('MapHelper/shouldShow: no instances list found → no instances to show → no map.');
-            } else {
-                $owApp->logger->debug('MapHelper/shouldShow: decided to hide the map, but not because of a XmlHttpRequest and not, because there is no valide session.');
-            }
+				$dirQuery->addTriple($this->dirInstances->getResourceVar(), $latProperty, $latVar);
+				$dirQuery->addTriple($this->dirInstances->getResourceVar(), $longProperty, $longVar);
 
-            return false;
-        }
-    }
+				$node     = new Erfurt_Sparql_Query2_Var('node'); // should be $node = new Erfurt_Sparql_Query2_BlankNode('bn'); but i heard this is not supported yet by zendb
+				$indQuery->addTriple($this->indInstances->getResourceVar(), new Erfurt_Sparql_Query2_Var('pred') , $node);
+				$indQuery->addTriple($node, $latProperty, $lat2Var);
+				$indQuery->addTriple($node, $longProperty, $long2Var);
+
+				$owApp->logger->debug('MapHelper/shouldShow: sent "' . $dirQuery . '" to know if SpacialThings are available.');
+				$owApp->logger->debug('MapHelper/shouldShow: sent "' . $indQuery . '" to know if SpacialThings are available.');
+
+				/* get result of the query */
+				$dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
+				$indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
+
+				$owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
+				$owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
+
+				if ($dirResult OR $indResult) {
+					$result = true;
+				} else {
+					$result = false;
+				}
+
+				return $result;
+			}
+		}
+
+		if($front->getRequest()->isXmlHttpRequest()) {
+			$owApp->logger->debug('MapHelper/shouldShow: xmlHttpRequest → no map.');
+		} else if(!$this->listHelper->listExists($listName)) {
+			$owApp->logger->debug('MapHelper/shouldShow: no instances list found → no instances to show → no map.');
+		} else {
+			$owApp->logger->debug('MapHelper/shouldShow: decided to hide the map, but not because of a XmlHttpRequest and not, because there is no valide session.');
+		}
+
+		return false;
+	}
 }
 

@@ -1,0 +1,76 @@
+<?php
+// vim: sw=4:sts=4:expandtab
+
+if ( isset($this->message) ) {
+	echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
+}
+?>
+<!-- The main Map div, will be populated by OpenLayers in JavaScript -->
+<div id="mainMap"></div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+// this function should be in a lib
+function loadScript (scriptUrl) {
+    var script  = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src  = scriptUrl;
+    $('head').append(script);
+}
+loadScript('<?php echo $this->componentUrlBase . 'classes/OpenLayers.js'; ?>');
+
+//]]>
+</script>
+
+<h1><?php echo $this->_('Map Component Setup') ?></h1>
+
+<fieldset><legend><?php echo $this->_('Info') ?></legend>
+<div>
+<table class="separated-vertical">
+	<tr>
+		<th><?php echo $this->_('OpenLayers Version') ?></th>
+		<td id="ol_version"></td>
+	</tr>
+</table>
+</div>
+</fieldset>
+
+<fieldset><legend><?php echo $this->_('API-Keys') ?></legend>
+<div>
+<table class="separated-vertical">
+	<tr>
+		<th>Provider</th>
+		<th>API-Key</th>
+	</tr>
+	<!--//
+		<tr id="newKey">
+			<td> <input class="text" type="text" name="new_key_provider" /> </td>
+			<td> <input class="text" type="text" name="new_key_key" /> </td>
+		</tr>
+		//-->
+	<?php foreach ($this->apikey as $provider => $key): ?>
+	<tr>
+		<td><?php echo $this->escape($provider) ?></td>
+		<td><?php echo $this->escape($key) ?></td>
+	</tr>
+	<?php endforeach; ?>
+</table>
+</div>
+<div class="clearall"></div>
+</fieldset>
+
+<fieldset><legend><?php echo $this->_('Map Providers')?></legend>
+<div>
+<table class="separated-vertical">
+</table>
+</div>
+</fieldset>
+
+<script type="text/javascript">
+//<![CDATA[
+
+           $('#ol_version').text(OpenLayers.VERSION_NUMBER);
+
+//]]>
+</script>

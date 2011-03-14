@@ -126,7 +126,7 @@ class Clusterer {
 		/**
 		 * Just a constraint
 		 */
-		if(($latInc > 0) and ($lonInc > 0)) {
+		if(false && ($latInc > 0) and ($lonInc > 0)) {
 
 			/**
 			 * Iterate each cell
@@ -178,8 +178,29 @@ class Clusterer {
 						/**
 						 * Else calculate latitude and longitude for the current cluster and add it to the clusters array.
 						 */
-						$cluster->createLonLat();
+						$cluster->createLonLat(true);
 						$this->clusters[] = $cluster;
+					}
+				}
+			}
+		}
+		
+		for ($i = 0; $i < count($this->markers); $i++) {
+			if(!$this->markers[$i]->getInCluster()) {
+				for ($j = $i+1; $j < count($this->markers); $j++) {
+					if(!$this->markers[$j]->getInCluster()) {
+						if ($this->markers[$i]->getLon() == $this->markers[$j]->getLon()
+						&& $this->markers[$i]->getLat() == $this->markers[$j]->getLat()) {
+							$cluster = new Cluster($this->viewArea);
+							if(!$this->markers[$i]->getInCluster()) {
+								$cluster->addMarker($this->markers[$i]);
+							}
+							$cluster->addMarker($this->markers[$j]);
+							$cluster->setIsMicroCluster(true);
+							$cluster->setUri("cluster://lat/" . $this->markers[$i]->getLat() . "/long/" .  $this->markers[$i]->getLon() . "/");
+							$cluster->createLonLat(true);
+							$this->clusters[] = $cluster;
+						}
 					}
 				}
 			}
@@ -199,7 +220,7 @@ class Clusterer {
 			 * Add the unclustered markers to the resulting markers.
 			 */
 			if( !$this->markers[$i]->getInCluster( ) ) {
-				$this->resultingMarkers[] = &$this->markers[$i];
+				$this->resultingMarkers[] = $this->markers[$i];
 			}
 		}
 	}

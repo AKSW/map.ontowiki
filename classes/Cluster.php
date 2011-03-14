@@ -18,7 +18,8 @@ class Cluster extends Marker {
      * set isCluster on true, to identify this object as cluster in the json serialization
      * -- not implemented in javascript --
      */
-    private $isCluster = true;
+    public $isCluster = true;
+    private $isMicroCluster;
 
     /**
      * The array of the markers in this cluster
@@ -63,6 +64,7 @@ class Cluster extends Marker {
      * @param &$marker a reference of a Marker object
      */
     public function addMarker( &$marker ) {
+    	$marker->setInCluster(true);
         $this->containingMarkers[] = &$marker;
     }
 
@@ -77,12 +79,15 @@ class Cluster extends Marker {
     /**
      * Calculates latitude and longitude for the cluster (arithmetic mean).
      */
-    public function createLonLat( ) {
+    public function createLonLat( $overwrite = true ) {
 
         /**
          * Check if the longitude and latitude is already set.
          */
-        if(!isset($this->longitude) OR !isset($this->latitude)){
+    	if($this->isMicroCluster) {
+    		$this->longitude = $this->containingMarkers[0]->getLon( );
+    		$this->latitude = $this->containingMarkers[0]->getLat( );
+    	} else if($overwrite || !isset($this->longitude) OR !isset($this->latitude)){
 
             /**
              * Adding up the latitude respactively longitude of all markers contained by the cluster
@@ -133,7 +138,25 @@ class Cluster extends Marker {
     public function getContent( ) {
         return $this->containingMarkers;
     }
+    
+    public function getLat() {
+    	createLonLat(true);
+    	return parent::getLat();
+    }
+    
+	public function getLon() {
+    	createLonLat(true);
+    	return parent::getLon();
+    }
 
+    public function setUri($uri) {
+    	$this->uri = $uri;
+    }
+    
+    public function setIsMicroCluster($isMicroCluster) {
+    	$this->isMicroCluster = $isMicroCluster;
+    }
+    
     /**
      * Set a value if the dateline is in the cluster or not
      * @param $var boolean

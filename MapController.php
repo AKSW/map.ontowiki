@@ -35,54 +35,62 @@ class MapController extends OntoWiki_Controller_Component
         $this->store    = $this->_erfurt->getStore();
     }
 
-    /**
-     * Shows the plain map without markers.
-     * Markers are fetched via Ajax by means of the markerActions.
-     */
     public function displayAction()
     {
-        $this->addModuleContext('main.window.map');
-        $this->view->placeholder('main.window.title')->set('OntoWiki Map Component');
-
-        $jsonRequestUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'marker'), array());
-        $jsonRequestUrl->setParam('use_limit', 'off', true);
-        $jsonRequestUrl->setParam('extent', '__extent__', true);
-        if($this->_request->getControllerName() == 'resource' && $this->_request->getActionName() == 'properties') {
-            $jsonRequestUrl->setParam('single_instance', 'on', true);
+        if (isset($this->_request->inline)) {
+            $inline = true;
+        } else {
+            $inline = false;
         }
-
-
-        $this->view->jsonRequestUrl   = $jsonRequestUrl;
-        $this->view->componentUrlBase = $this->_componentUrlBase;
-        $this->view->extent           = $this->_getMaxExtent();
-        $this->view->config           = $this->_privateConfig;
-
-        $this->_owApp->logger->debug('MapComponent/displayAction: maximal map extention: ' . var_export($this->view->extent, true));
-    }
-
-
-    /**
-     * returns the plain map without markers, as html.
-     * Markers are fetched via Ajax by means of the markerActions.
-     * this function is mostly similar to the displayAction in its code.
-     * I think the inlineAction will be used in the diyplaAction in the future
-     */
-    public function inlineAction()
-    {
-        $this->_helper->layout->disableLayout();
         
-        // default values from configuration
-        $jsonRequestUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'marker'), array('single_instance'));
-        $jsonRequestUrl->setParam('clustering', 'off', true);
-        $jsonRequestUrl->setParam('use_limit', 'on', true);
-        $jsonRequestUrl->setParam('extent', '__extent__', true);
+        if ($inline == true) {
+            /**
+             * returns the plain map without markers, as html.
+             * Markers are fetched via Ajax by means of the markerActions.
+             * this function is mostly similar to the displayAction in its code.
+             * I think the inlineAction will be used in the diyplaAction in the future
+             */
+            $this->_helper->layout->disableLayout();
 
-        $this->view->jsonRequestUrl   = $jsonRequestUrl;
-        $this->view->componentUrlBase = $this->_componentUrlBase;
-        $this->view->extent           = $this->_getMaxExtent();
-        $this->view->config           = $this->_privateConfig;
+            // default values from configuration
+            $jsonRequestUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'marker'), array('single_instance'));
+            //$jsonRequestUrl->setParam('clustering', 'off', true);
+            $jsonRequestUrl->setParam('use_limit', 'on', true);
+            $jsonRequestUrl->setParam('extent', '__extent__', true);
 
-        $this->_owApp->logger->debug('MapComponent/inlineAction: maximal map extention: ' . var_export($this->view->extent, true));
+            $this->view->jsonRequestUrl   = $jsonRequestUrl;
+            $this->view->componentUrlBase = $this->_componentUrlBase;
+            $this->view->extent           = $this->_getMaxExtent();
+            $this->view->config           = $this->_privateConfig;
+            $this->view->mapId            = 'mapContainer';
+            $this->view->mapVar           = 'minimap';
+
+            $this->_owApp->logger->debug('MapComponent/inlineAction: maximal map extention: ' . var_export($this->view->extent, true));
+        } else {
+            /**
+             * Shows the plain map without markers.
+             * Markers are fetched via Ajax by means of the markerActions.
+             */
+            $this->addModuleContext('main.window.map');
+            $this->view->placeholder('main.window.title')->set('OntoWiki Map Component');
+
+            $jsonRequestUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'marker'), array());
+            $jsonRequestUrl->setParam('use_limit', 'off', true);
+            $jsonRequestUrl->setParam('extent', '__extent__', true);
+            //if($this->_request->getControllerName() == 'resource' && $this->_request->getActionName() == 'properties') {
+            if ($this->_owApp->lastRoute == 'properties') {
+                $jsonRequestUrl->setParam('single_instance', 'on', true);
+            }
+
+            $this->view->jsonRequestUrl   = $jsonRequestUrl;
+            $this->view->componentUrlBase = $this->_componentUrlBase;
+            $this->view->extent           = $this->_getMaxExtent();
+            $this->view->config           = $this->_privateConfig;
+            $this->view->mapId            = 'mainMap';
+            $this->view->mapVar           = 'manager';
+
+            $this->_owApp->logger->debug('MapComponent/displayAction: maximal map extention: ' . var_export($this->view->extent, true));
+        }
     }
 
     /**
@@ -92,8 +100,8 @@ class MapController extends OntoWiki_Controller_Component
     {
         require_once $this->_componentRoot . 'classes/Marker.php';
         require_once $this->_componentRoot . 'classes/Clusterer.php';
-//        require_once $this->_componentRoot . 'classes/GeoCoder.php';
-        
+        //        require_once $this->_componentRoot . 'classes/GeoCoder.php';
+
         // tells the OntoWiki to not apply the template to this action
         $this->_helper->viewRenderer->setNoRender();
         $this->_helper->layout->disableLayout();
@@ -117,24 +125,24 @@ class MapController extends OntoWiki_Controller_Component
         if($this->resources === null) {
             $this->_getResources( $viewArea );
         }
-        
+
         $markers = array();
 
         if($this->resources) {
 
             foreach ($this->resources as $r) {
-            	
-            	/**
-            	 * for single instances
-            	 * @var String contains the uri of the current property
-            	 */
+                 
+                /**
+                 * for single instances
+                 * @var String contains the uri of the current property
+                 */
                 $uri = isset($r[$this->resourceVar]) ? $r[$this->resourceVar] : $this->resource;
 
                 if (empty ($r['lat']) || empty ($r['long'])) {
-                   if(isset($r['lat2']) && isset($r['long2']) && !empty($r['lat2']) && !empty($r['long2'])) {
+                    if(isset($r['lat2']) && isset($r['long2']) && !empty($r['lat2']) && !empty($r['long2'])) {
                         $lat = $r['lat2'];
                         $long = $r['long2'];
-                   }
+                    }
                 } else {
                     $lat = $r['lat'];
                     $long = $r['long'];
@@ -179,7 +187,57 @@ class MapController extends OntoWiki_Controller_Component
     public function configAction()
     {
         // this function gets and sends some persistent configuration values
-        // $this->view->OpenLayersVersion = 
+        // $this->view->OpenLayersVersion = JavaScript, does this
+        $this->view->componentUrlBase = $this->_componentUrlBase;
+        $this->view->apikey = $this->_privateConfig->apikey;
+    }
+
+    /**
+     * give a boundingbox, to generate a filter, which contains only markers within this box
+     */
+    public function filterAction()
+    {
+        /**
+         * read configuration
+         */
+        $latProperties  = $this->_privateConfig->property->latitude->toArray();
+        $longProperties = $this->_privateConfig->property->longitude->toArray();
+        $latProperty    = $latProperties[0];
+        $longProperty   = $longProperties[0];
+         
+        /*
+         * Find the used datatypes
+         */
+        $datatypes = array();
+         
+        /**
+         * Get the bounds in which the filtert markers should be
+         * @var array with numbers
+         */
+        $bounds = array();
+        $bounds['top'] = $this->_request->getParam('top', null);
+        $bounds['rgt'] = $this->_request->getParam('right', null);
+        $bounds['btm'] = $this->_request->getParam('bottom', null);
+        $bounds['lft'] = $this->_request->getParam('left', null);
+         
+        $dttyps = array();
+        foreach ($datatypes as $datatype) {
+
+            $bnd = array();
+
+            foreach ($bounds as $key => $_bnd) {
+                $bnd[$key] = new Erfurt_Sparql_Query2_RDFLiteral($_bnd,$datatype);
+            }
+
+            $bnd['top'] = new Erfurt_Sparql_Query2_Smaller('?lat',  $bnd['top']);
+            $bnd['rgt'] = new Erfurt_Sparql_Query2_Smaller('?long', $bnd['rgt']);
+            $bnd['btm'] = new Erfurt_Sparql_Query2_Larger('?lat',   $bnd['btm']);
+            $bnd['lft'] = new Erfurt_Sparql_Query2_Larger('?long',  $bnd['lft']);
+            $dttyps[] = new Erfurt_Sparql_Query2_ConditionalAndExpression($bnd);
+        }
+        $filter = new Erfurt_Sparql_Query2_Filter(new Erfurt_Sparql_Query2_ConditionalOrExpression($dttyps));
+         
+        $this->_session->instances->addTripleFilter($filter, "mapBounds");
     }
 
     public function __call($method, $args)
@@ -211,7 +269,7 @@ class MapController extends OntoWiki_Controller_Component
                     // get listHelper
                     $this->listHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('List');
                 }
-                
+
                 $listName = "instances";
                 if($this->listHelper->listExists($listName)){
                     $list = $this->listHelper->getList($listName);
@@ -273,7 +331,7 @@ class MapController extends OntoWiki_Controller_Component
              */
             //$resourcesDir = $this->cpVarToKey($resourcesDir, $this->resourceVar);
             //$resourcesInd = $this->cpVarToKey($resourcesInd, $this->resourceVar);
-            
+
             $this->resources = array_merge_recursive($resourcesDir, $resourcesInd);
 
             /**
@@ -302,11 +360,11 @@ class MapController extends OntoWiki_Controller_Component
 
             /* get result of the query */
             $this->resources   = $this->_owApp->erfurt->getStore()->sparqlQuery($queryDirect);
-            
+
             if (empty($this->resources[0]['lat']) OR empty($this->resources[0]['long'])) {
-            	$this->resources = $this->_owApp->erfurt->getStore()->sparqlQuery($queryIndire);
+                $this->resources = $this->_owApp->erfurt->getStore()->sparqlQuery($queryIndire);
             }
-            
+
         } else {
             $this->_owApp->logger->debug('MapComponent/_getResources request single_instace contains neither "on" nor "off".');
         }
@@ -326,7 +384,7 @@ class MapController extends OntoWiki_Controller_Component
             $this->_getResources( );
         }
 
-//        $this->_owApp->logger->debug('MapComponent/_getMaxExtent: resources: ' . var_export($this->resources, true));
+        //        $this->_owApp->logger->debug('MapComponent/_getMaxExtent: resources: ' . var_export($this->resources, true));
 
         $lat = array();
         $long = array();
@@ -351,7 +409,7 @@ class MapController extends OntoWiki_Controller_Component
                     "right"  => max($long),
                     "bottom" => min($lat),
                     "left"   => min($long)
-                );
+            );
         } else {
             /**
              * set default possition, if no resource is selected
@@ -361,7 +419,7 @@ class MapController extends OntoWiki_Controller_Component
                     "right"  => $this->_privateConfig->default->longitude,
                     "bottom" => $this->_privateConfig->default->latitude,
                     "left"   => $this->_privateConfig->default->longitude
-                );
+            );
         }
 
         $this->_owApp->logger->debug('MapComponent/_getMaxExtent: extent: ' . var_export($return, true));
@@ -380,9 +438,9 @@ class MapController extends OntoWiki_Controller_Component
      * 	)
      * );
      * $key = 'resourceUri';
-     * 
+     *
      * will become
-     * 
+     *
      * $array = array(
      * 	'http://comiles.eu/~natanael/foaf.rdf#me' => array(
      * 		'resourceUri' => 'http://comiles.eu/~natanael/foaf.rdf#me',
@@ -390,7 +448,7 @@ class MapController extends OntoWiki_Controller_Component
      * 		'lat' => '12.3456'
      * 	)
      * );
-     * 
+     *
      * @param array $array The Resultset, which is returned by a sparqlquery
      * @param String $key of the array element holding the URI
      */

@@ -28,6 +28,8 @@ class Marker {
      *  status properties indeicating, if a marker is on the Map (visibility) and if a marker is clustered and represented by a cluster on the map
      */
     private $onMap, $inCluster;
+    
+    //public $isCluster;
 
     /**
      *  The url of the icon for the marker

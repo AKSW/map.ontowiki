@@ -2,89 +2,136 @@
 // vim: sw=4:sts=4:expandtab
 
 if ( isset($this->message) ) {
-echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
+    echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
 }
 ?>
 <!-- The main Map div, will be populated by OpenLayers in JavaScript -->
-<div id="mainMap"></div>
+<div
+	id="<?php echo $this->mapId; ?>" class="is-processing width99"></div>
 
 <script type="text/javascript">
 //<![CDATA[
 
-// resize the mainMap according to the windowheight, if it is resized
-$('#mainMap').addClass('width99');
-$('#mainMap').addClass('is-processing');
+    // this function should be in a lib
+	function loadScript (scriptUrl) {
+	    var script  = document.createElement('script');
+	    script.type = 'text/javascript';
+	    script.src  = scriptUrl;
+	    $('head').append(script);
+	}
 
-// this function should be in a lib
-function loadScript (scriptUrl) {
-    var script  = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src  = scriptUrl;
-    $('head').append(script);
+	// this function should be in a lib
+	function loadStyle (styleUrl, media) {
+	    if(!media) {
+	        var media = 'screen';
+	    }
+	    var link  = document.createElement('link');
+	    link.type = 'text/css';
+	    link.rel = 'stylesheet';
+	    link.media = media;
+	    link.href  = styleUrl;
+	    $('head').append(link);
+	}
+           
+// TODO resize map to page height if it is the mainmap
+loadStyle('<?php echo $this->componentUrlBase . 'css/OpenLayers.css'; ?>', 'screen');
+
+<?php
+// TODO put these uris into configuration
+if (!isset($this->config->load->google) || !$this->config->load->google == false) {
+    echo 'loadScript(\'http://maps.google.com/maps?file=api&v=2&hl=de&key=' . $this->config->apikey->google . '&async=2\')' . ";\n";
 }
+if (!isset($this->config->load->yahoo) || !$this->config->load->yahoo == false) {
+    echo 'loadScript(\'http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=' . $this->config->apikey->yahoo . '\')' . ";\n";
+}
+?>
+loadScript('<?php echo $this->componentUrlBase . 'classes/OpenLayers.js'; ?>');
+loadScript('<?php echo $this->componentUrlBase . 'classes/MapManager.js'; ?>');
 
-// this function should be in a lib
-function loadStyle (styleUrl, media) {
-    if(!media) {
-        var media = 'screen';
+
+//resize the mainMap according to the windowheight, if it is resized
+//$('#<?php echo $this->mapId; ?>').addClass('width99');
+//$('#<?php echo $this->mapId; ?>').addClass('is-processing');
+$('#<?php echo $this->mapId; ?>').height( $('#<?php echo $this->mapId; ?>').width() );
+
+var <?php echo $this->mapVar; ?>;
+
+var disabledProviders = new Array();
+
+<?php
+    foreach ($this->config->load as $provider => $enabled) {
+        if ($enabled == false) {
+            echo 'disabledProviders.push(\'' . $provider . '\')' . ";\n";
+        }
     }
-    var link  = document.createElement('link');
-    link.type = 'text/css';
-    link.rel = 'stylesheet';
-    link.media = media;
-    link.href  = styleUrl;
-    $('head').append(link);
-}
+?>
+
 
 /**
- * Check if NewMapManager and OpenLayers objects exist,
+ * Check if MapManager, Google and OpenLayers objects exist,
  * if so execute goForMap function,
  * else start this function again after 100 ms
  */
 function waitForMap () {
-    if (typeof(NewMapManager) == 'undefined' || typeof(OpenLayers) == 'undefined' || typeof(G_HYBRID_MAP) == 'undefined') {
+	<?php
+    if (!isset($this->config->load->google) || !$this->config->load->google == false) {
+        $google = ' || typeof(G_HYBRID_MAP) == \'undefined\'';
+    } else {
+        $google = '';
+    }
+    ?>
+    if (typeof(MapManager) == 'undefined' || typeof(OpenLayers) == 'undefined' <?php echo $google; ?>) {
         setTimeout('waitForMap()', 100);
     } else {
         goForMap();
     }
 }
 
-loadStyle('<?php echo $this->componentUrlBase . 'css/OpenLayers.css'; ?>', 'screen');
-loadScript('<?php echo 'http://maps.google.com/maps?file=api&v=2&hl=de&key=' . $this->config->apikey->google . '&async=2'; ?>');
-//loadScript('<?php echo 'http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=' . $this->config->apikey->yahoo . ''; ?>');
-loadScript('<?php echo $this->componentUrlBase . 'classes/OpenLayers.js'; ?>');
-loadScript('<?php echo $this->componentUrlBase . 'classes/NewMapManager.js'; ?>');
-
 $(document).ready(waitForMap);
 
 function goForMap () {
-    $('#mainMap').height( $('#mainMap').width() ); // TODO resize map to page height
-    $('#mainMap').removeClass('is-processing');
-    var manager             = new NewMapManager(
-        $('#mainMap').get(0),                      // the dom object containing the map
+    $('#<?php echo $this->mapId; ?>').removeClass('is-processing');
+    <?php echo $this->mapVar; ?> = new MapManager(
+        $('#<?php echo $this->mapId; ?>').get(0),       // the dom object containing the map
         <?php echo json_encode($this->extent) ?>,       // the extend on the map, which is shown
         '<?php echo (string) $this->jsonRequestUrl ?>'  // the request URL, wher to get the markerdata
     );
 
+    <?php echo $this->mapVar; ?>.disabledProviders = disabledProviders;
+
+    <?php
+    // TODO put these uris into configuration
+    if (!isset($this->config->load->localMap) || !$this->config->load->localMap == false) {
+        echo $this->mapVar . '.localMapTitel = \'' . $this->config->localMap->titel . '\'' . ";\n";
+        echo $this->mapVar . '.localMapUrl = \'' . $this->config->localMap->url . '\'' . ";\n";
+    }
+    ?>
+    
     // the themePath doesn't seam to work
-    manager.themePath       = '<?php echo $this->componentUrlBase ?>css/OpenLayers.css';
-    manager.defaultLayer    = '<?php echo $this->config->default->layer ?>';
+    <?php echo $this->mapVar; ?>.themePath       = '<?php echo $this->componentUrlBase ?>css/OpenLayers.css';
+    <?php echo $this->mapVar; ?>.defaultLayer    = '<?php echo $this->config->default->layer ?>';
 
     // set the image path to the ontowiki theme's image folder
-    manager.imgPath         = '<?php echo $this->themeUrlBase; ?>images/';
+    <?php echo $this->mapVar; ?>.imgPath         = '<?php echo $this->themeUrlBase; ?>images/';
 
-    manager.icon = new OpenLayers.Icon(
+    <?php echo $this->mapVar; ?>.pic = '<?php echo $this->componentUrlBase . $this->config->icon->path; ?>';
+    <?php echo $this->mapVar; ?>.icon = new OpenLayers.Icon(
         '<?php echo $this->componentUrlBase . $this->config->icon->path; ?>',
         new OpenLayers.Size(<?php echo $this->config->icon->size; ?>),
         new OpenLayers.Pixel(<?php echo $this->config->icon->offset; ?>)
     );
-    manager.clusterIcon = new OpenLayers.Icon(
+    <?php echo $this->mapVar; ?>.clusterIcon = new OpenLayers.Icon(
         '<?php echo $this->componentUrlBase . $this->config->cluster->path; ?>',
         new OpenLayers.Size(<?php echo $this->config->cluster->size; ?>),
         new OpenLayers.Pixel(<?php echo $this->config->cluster->offset; ?>)
     );
-    manager.prepare();
-    manager.init();
+
+    $('body').bind('ontowiki.selection.changed', function(event, data) {
+    	<?php echo $this->mapVar; ?>.selectEvent(data, minimap);
+    });
+    
+    <?php echo $this->mapVar; ?>.prepare();
+    <?php echo $this->mapVar; ?>.init();
 }
 
 //]]>

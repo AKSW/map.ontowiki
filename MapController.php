@@ -12,6 +12,7 @@
  */
 class MapController extends OntoWiki_Controller_Component
 {
+	
     private $model;
     private $resource;
     private $store;
@@ -27,6 +28,8 @@ class MapController extends OntoWiki_Controller_Component
 
     public function init()
     {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('Initializing MapPlugin Controller');
         parent::init();
         if(is_object($this->_owApp->selectedResource)){
             $this->resource = $this->_owApp->selectedResource->getIri();
@@ -37,6 +40,8 @@ class MapController extends OntoWiki_Controller_Component
 
     public function displayAction()
     {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('displayAction');
         if (isset($this->_request->inline)) {
             $inline = true;
         } else {

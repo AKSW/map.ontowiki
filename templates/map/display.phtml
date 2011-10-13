@@ -52,7 +52,13 @@ loadScript('<?php echo $this->componentUrlBase . 'classes/MapManager.js'; ?>');
 //resize the mainMap according to the windowheight, if it is resized
 //$('#<?php echo $this->mapId; ?>').addClass('width99');
 //$('#<?php echo $this->mapId; ?>').addClass('is-processing');
-$('#<?php echo $this->mapId; ?>').height( $('#<?php echo $this->mapId; ?>').width() );
+
+// TODO: have to implement a better check here and maybe get a better size
+if ($('#<?php echo $this->mapId; ?>').width() > 100) {
+	$('#<?php echo $this->mapId; ?>').height( $('#<?php echo $this->mapId; ?>').width() );
+} else {
+	$('#<?php echo $this->mapId; ?>').height( '550px' );
+}
 
 var <?php echo $this->mapVar; ?>;
 

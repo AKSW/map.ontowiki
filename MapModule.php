@@ -1,6 +1,6 @@
 <?php
 // vim: sw=4:sts=4:expandtab
-require_once 'OntoWiki/Module.php';
+//require_once 'OntoWiki/Module.php';
 
 /**
  * OntoWiki module – minimap
@@ -12,10 +12,12 @@ require_once 'OntoWiki/Module.php';
  * @license    http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)
  * @version    $Id: minimap.php 4241 2009-10-05 22:33:25Z arndtn $
  */
-class MinimapModule extends OntoWiki_Module
+class MapModule extends OntoWiki_Module
 {
     public function init()
     {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('Initializing MapPlugin Module');
         // TODO: fix it, cause exception
 /*    $this->_owApp->translate->addTranslation(_OWROOT . $this->_config->extensions->modules .
         $this->_name . DIRECTORY_SEPARATOR . 'languages/', null,
@@ -25,11 +27,15 @@ class MinimapModule extends OntoWiki_Module
 
     public function getTitle()
     {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('getTitle');
         return 'Map';
     }
 
     public function getContents()
     {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('getContents');
 //        if(isset($this->_owApp->session->instances)) {
 			$this->_owApp->logger->debug('MimimapModule/getContents: lastRoute = "' . $this->_owApp->lastRoute . '".');
 			if ($this->_owApp->lastRoute == 'properties') {
@@ -53,6 +59,8 @@ class MinimapModule extends OntoWiki_Module
 
     public function shouldShow()
     {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('shouldShow?');
         if(class_exists('MapHelper')) {
             $helper = $this->_owApp->extensionManager->getComponentHelper('map');
            // $helper = new MapHelper($this->_owApp->extensionManager);
@@ -68,6 +76,8 @@ class MinimapModule extends OntoWiki_Module
      * @return string
      */
     public function getMenu() {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('getMenu');
         // build main menu (out of sub menus below)
         $mainMenu = new OntoWiki_Menu();
 
@@ -114,6 +124,8 @@ class MinimapModule extends OntoWiki_Module
 
     public function getStateId()
     {
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('getStateId');
         $id = $this->_owApp->selectedModel
             . $this->_owApp->selectedResource;
         

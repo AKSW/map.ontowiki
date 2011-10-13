@@ -27,6 +27,8 @@ class MapHelper extends OntoWiki_Component_Helper
 
 	public function init()
 	{
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('Initializing MapPlugin Helper');
 		$onSwitch = false;  // decide, if map should be on
 
 		if (isset($this->_privateConfig->show->tab)){
@@ -58,7 +60,8 @@ class MapHelper extends OntoWiki_Component_Helper
 
 	public function shouldShow ()
 	{
-			
+    	$logger = OntoWiki::getInstance()->logger;
+    	$logger->debug('shouldShow Helper');
 		if($this->listHelper == null) {
 			$this->listHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('List');
 		}

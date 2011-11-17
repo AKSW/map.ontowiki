@@ -196,6 +196,11 @@ class MapController extends OntoWiki_Controller_Component
         $this->view->componentUrlBase = $this->_componentUrlBase;
         $this->view->apikey = $this->_privateConfig->apikey;
     }
+    
+    public function configureAction()
+    {
+        $this->view->config = $this->_privateConfig->toArray();
+    }
 
     /**
      * give a boundingbox, to generate a filter, which contains only markers within this box

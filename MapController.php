@@ -1,11 +1,10 @@
 <?php
-// vim: sw=4:sts=4:expandtab
 
 /**
  * Map component controller.
  *
- * @category   OntoWiki
- * @package    OntoWiki_extensions_components_map
+ * @category OntoWiki
+ * @package OntoWiki_extensions_components_map
  * @author Natanael Arndt <arndtn@gmail.com>
  * TODO comments
  */
@@ -19,7 +18,6 @@ class MapController extends OntoWiki_Controller_Component
     private $_instances = null;
     private $_resources = null;
     private $_resourceVar = 'resource';
-    private $_config;
 
     public static $maxResources = 1000;
 

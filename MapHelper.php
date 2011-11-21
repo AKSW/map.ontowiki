@@ -8,7 +8,6 @@
  * @category   OntoWiki
  * @package    OntoWiki_extensions_components_map
  * @author Natanael Arndt <arndtn@gmail.com>
- * @version $Id$
  * TODO comments
  */
 class MapHelper extends OntoWiki_Component_Helper

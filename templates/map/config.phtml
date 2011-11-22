@@ -1,13 +1,8 @@
 <?php
-// vim: sw=4:sts=4:expandtab
-
 if ( isset($this->message) ) {
-	echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
+        echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
 }
 ?>
-<!-- The main Map div, will be populated by OpenLayers in JavaScript -->
-<div id="mainMap"></div>
-
 <script type="text/javascript">
 //<![CDATA[
 
@@ -23,54 +18,134 @@ loadScript('<?php echo $this->componentUrlBase . 'classes/OpenLayers.js'; ?>');
 //]]>
 </script>
 
-<h1><?php echo $this->_('Map Component Setup') ?></h1>
+<h1><?php echo $this->_('Map Extension Configuration') ?></h1>
 
-<fieldset><legend><?php echo $this->_('Info') ?></legend>
-<div>
-<table class="separated-vertical">
-	<tr>
-		<th><?php echo $this->_('OpenLayers Version') ?></th>
-		<td id="ol_version"></td>
-	</tr>
-</table>
-</div>
-</fieldset>
+<!-- Later the form should be send with and ajax request -->
+<form action="<?php echo $this->urlBase;?>exconf/conf" method="POST">
+    <input type="hidden" name="name" value="map" />
+    <fieldset>
+        <legend><?php echo $this->_('Info') ?></legend>
+        <div>
+            <table class="separated-vertical">
+                <tr>
+                    <th><?php echo $this->_('OpenLayers Version') ?></th>
+                    <td id="ol_version"></td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
 
-<fieldset><legend><?php echo $this->_('API-Keys') ?></legend>
-<div>
-<table class="separated-vertical">
-	<tr>
-		<th>Provider</th>
-		<th>API-Key</th>
-	</tr>
-	<!--//
-		<tr id="newKey">
-			<td> <input class="text" type="text" name="new_key_provider" /> </td>
-			<td> <input class="text" type="text" name="new_key_key" /> </td>
-		</tr>
-		//-->
-	<?php foreach ($this->apikey as $provider => $key): ?>
-	<tr>
-		<td><?php echo $this->escape($provider) ?></td>
-		<td><?php echo $this->escape($key) ?></td>
-	</tr>
-	<?php endforeach; ?>
-</table>
-</div>
-<div class="clearall"></div>
-</fieldset>
+    <fieldset>
+        <legend><?php echo $this->_('General Settings')?></legend>
+        <div>
+            <table class="separated-vertical">
+                <tr>
+                    <th><?php echo $this->_('Show Map Tab')?></th>
+                    <td>
+                        <select name="show.tab">
+                            <?php foreach ($this->config->show->_tab as $option): ?>
+                            <?php
+                                if($this->config->show->tab == $option) {
+                                    $sel = true;
+                                } else {
+                                    $sel = false;
+                                }
+                            ?>
+                            <option value="<?php echo $this->escape($option) ?>" <?php echo $sel?'selected="true"':'' ?>><?php echo $this->escape($option) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->_('Default Layer')?></th>
+                    <td>
+                        <select name="default.layer">
+                            <?php foreach ($this->config->default->_layer as $option): ?>
+                            <?php
+                                if($this->config->default->layer == $option) {
+                                    $sel = true;
+                                } else {
+                                    $sel = false;
+                                }
+                            ?>
+                            <option value="<?php echo $this->escape($option) ?>" <?php echo $sel?'selected="true"':'' ?>><?php echo $this->escape($option) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->_('Home')?></th>
+                    <td>
+                        <table>
+                            <tr>
+                                <th><?php echo $this->_('Latitude')?></th>
+                                <td>
+                                    <input class="text width99" type="text" name="default.latitude" value="<?php echo $this->escape($this->config->default->latitude) ?>" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><?php echo $this->_('Longitude')?></th>
+                                <td>
+                                    <input class="text width99" type="text" name="default.longitude" value="<?php echo $this->escape($this->config->default->longitude) ?>" />
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
 
-<fieldset><legend><?php echo $this->_('Map Providers')?></legend>
-<div>
-<table class="separated-vertical">
-</table>
-</div>
-</fieldset>
+    <fieldset>
+        <legend><?php echo $this->_('Map Providers')?></legend>
+        <div>
+            <table class="separated-vertical">
+            </table>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend><?php echo $this->_('API-Keys') ?></legend>
+        <div>
+            <table class="separated-vertical">
+                <tr>
+                    <th>Provider</th>
+                    <th>API-Key</th>
+                </tr>
+                <!--//
+                <tr id="newKey">
+                    <td>
+                        <input class="text" type="text" name="newMapProvider" />
+                    </td>
+                    <td>
+                        <input class="text" type="text" name="newMapKey" />
+                    </td>
+                </tr>
+                //-->
+                <?php foreach ($this->apikey as $provider => $key): ?>
+                <tr>
+                    <td><?php echo $this->escape($provider) ?></td>
+                    <td>
+                        <input class="text width99" type="text" name="apikey.<?php echo $this->escape($provider) ?>" value="<?php echo $this->escape($key) ?>" />
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+        <div class="clearall"></div>
+    </fieldset>
+    <?php $confStr = json_encode(array('enabled'=>true, 'private'=>$this->configArray)); ?>
+    <textarea name="config"><?php echo $confStr; ?></textarea> <br/>
+    <input type="submit" name="send" value="senden"/>
+</form>
 
 <script type="text/javascript">
 //<![CDATA[
-
-           $('#ol_version').text(OpenLayers.VERSION_NUMBER);
-
+    $('#ol_version').text(OpenLayers.VERSION_NUMBER);
 //]]>
 </script>
+
+hier ein minimal working example - direkt in json rumschreiben...<br/>
+alternativ kann man eine schöne gui machen die am ende den json string in die passenden post parameter packt.<br/>
+nur der enabled wert und und die private config kann geändert werden. <br/>
+mann muss eingeloggt sein damit es funktioniert. es wird ajax empfohlen weil man sonst auf der standard config seite landet.

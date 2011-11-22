@@ -198,15 +198,14 @@ class MapController extends OntoWiki_Controller_Component
      */
     public function configAction()
     {
+        $this->view->placeholder('main.window.title')->set('OntoWiki Map Extension Configuration');
         // this function gets and sends some persistent configuration values
         // $this->view->OpenLayersVersion = JavaScript, does this
         $this->view->componentUrlBase = $this->_componentUrlBase;
         $this->view->apikey = $this->_privateConfig->apikey;
-    }
 
-    public function configureAction()
-    {
-        $this->view->config = $this->_privateConfig->toArray();
+        $this->view->config = $this->_privateConfig;
+        $this->view->configArray = $this->_privateConfig->toArray();
     }
 
     /**

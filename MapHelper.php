@@ -5,8 +5,8 @@
  * Checks whether there are geospacial properties in result of the currant QueryObject
  * and registers the Map tab component if so.
  *
- * @category   OntoWiki
- * @package    OntoWiki_extensions_components_map
+ * @category OntoWiki
+ * @package OntoWiki_extensions_components_map
  * @author Natanael Arndt <arndtn@gmail.com>
  * TODO comments
  */
@@ -43,7 +43,6 @@ class MapHelper extends OntoWiki_Component_Helper
 
         if ($onSwitch) {
             // register new tab
-            require_once 'OntoWiki/Navigation.php';
 
             if (!OntoWiki_Navigation::isRegistered('map')) {
                 OntoWiki_Navigation::register(

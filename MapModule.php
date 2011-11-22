@@ -5,10 +5,11 @@
  *
  * display a minimap of the currently visible resources (if any)
  *
- * @package    ontowiki
- * @copyright  Copyright (c) 2008, {@link http://aksw.org AKSW}
- * @license    http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)
- * @version    $Id: minimap.php 4241 2009-10-05 22:33:25Z arndtn $
+ * @category OntoWiki
+ * @package OntoWiki_extensions_components_map
+ * @author Natanael Arndt <arndtn@gmail.com>
+ * @copyright Copyright (c) 2008, {@link http://aksw.org AKSW}
+ * @license http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)
  */
 class MapModule extends OntoWiki_Module
 {

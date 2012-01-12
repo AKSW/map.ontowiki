@@ -57,6 +57,22 @@ class MapHelper extends OntoWiki_Component_Helper
                 );
             }
         }
+
+        /**
+         * From GeoCoder
+         */
+
+        $owApp = OntoWiki::getInstance();
+        // if a model has been selected
+        if ($owApp->selectedModel != null) {
+            // register with extras menu
+            $this->translate  = $owApp->translate;
+            $appMenu        = OntoWiki_Menu_Registry::getInstance()->getMenu('application');
+            $extrasMenu     = $appMenu->getSubMenu('Extras');
+            $geoCoderLabel  = $this->translate->_('Geo Coder', $owApp->config->languages->locale);
+            $geoCoderUrl    = $owApp->urlBase . 'geocoder/init';
+            $extrasMenu->setEntry($geoCoderLabel, $geoCoderUrl);
+        }
     }
 
     public function shouldShow ()

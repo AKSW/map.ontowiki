@@ -31,7 +31,7 @@ class GeocoderController extends OntoWiki_Controller_Component
             throw new OntoWiki_Exception('No model pre-selected and missing parameter m (model)!');
             return();
         } else {
-            $this->model = $this->_owApp->selectedModel;
+            $this->_model = $this->_owApp->selectedModel;
         }
 
         // disable tabs
@@ -39,11 +39,11 @@ class GeocoderController extends OntoWiki_Controller_Component
         OntoWiki_Navigation::disableNavigation();
 
         // get translation object
-        $this->translate = $this->_owApp->translate;
+        $this->_translate = $this->_owApp->translate;
 
         //set title of main window ...
         $this->view->placeholder('main.window.title')->set(
-            $this->translate->_('Geo Coder', $this->_config->languages->locale)
+            $this->_translate->_('Geo Coder', $this->_config->languages->locale)
         );
     }
 
@@ -59,7 +59,7 @@ class GeocoderController extends OntoWiki_Controller_Component
         $toolbar->appendButton(
             OntoWiki_Toolbar::SUBMIT,
             array(
-                'name' => $this->translate->_(
+                'name' => $this->_translate->_(
                     'Start GeoCoder',
                     $this->_config->languages->locale
                 ),
@@ -99,7 +99,7 @@ class GeocoderController extends OntoWiki_Controller_Component
         $toolbar = $this->_owApp->toolbar;
         $toolbar->appendButton(
             OntoWiki_Toolbar::SUBMIT,
-            array('name' => $this->translate->_('Back', $this->_config->languages->locale), 'id' => 'geocoder')
+            array('name' => $this->_translate->_('Back', $this->_config->languages->locale), 'id' => 'geocoder')
         );
         $this->view->placeholder('main.window.toolbar')->set($toolbar);
         $this->view->formActionUrl = $this->_config->urlBase . 'geocoder/init';
@@ -119,11 +119,11 @@ class GeocoderController extends OntoWiki_Controller_Component
         $options['result_format'] = "plain";
         $options['use_ac'] = false;
         try {
-            $result = $this->model->sparqlQuery($simpleQuery, $options);
+            $result = $this->_model->sparqlQuery($simpleQuery, $options);
         } catch (Exception $e) {
             $this->_owApp->appendMessage(
                 new OntoWiki_Message(
-                    ($this->translate->_('Query is not valid. Received Message:', $this->_config->languages->locale))
+                    ($this->_translate->_('Query is not valid. Received Message:', $this->_config->languages->locale))
                     . $e->getMessage(),
                     OntoWiki_Message::ERROR
                 )
@@ -134,7 +134,7 @@ class GeocoderController extends OntoWiki_Controller_Component
         if (sizeOf($result) == 0) {
             $this->_owApp->appendMessage(
                 new OntoWiki_Message(
-                    ($this->translate->_('No Data found for this query.', $this->_config->languages->locale)),
+                    ($this->_translate->_('No Data found for this query.', $this->_config->languages->locale)),
                     OntoWiki_Message::ERROR
                 )
             );
@@ -159,7 +159,7 @@ class GeocoderController extends OntoWiki_Controller_Component
                 //geocoding day limit reached
                 $this->_owApp->appendMessage(
                     new OntoWiki_Message(
-                        $this->translate->_('GEOCODER_GOOGLE_STATUS_620', $this->_config->languages->locale),
+                        $this->_translate->_('GEOCODER_GOOGLE_STATUS_620', $this->_config->languages->locale),
                         OntoWiki_Message::ERROR
                     )
                 );
@@ -168,7 +168,7 @@ class GeocoderController extends OntoWiki_Controller_Component
 
                 $writeResult = $this->_writeCoordinates($uri, $coordinates);
                 if ($writeResult == true) {
-                    $message = $this->translate->_(
+                    $message = $this->_translate->_(
                         'Accurate coordinates received for resource %1$s. 2 Statements were added.',
                         $this->_config->languages->locale
                     );
@@ -180,12 +180,12 @@ class GeocoderController extends OntoWiki_Controller_Component
                         )
                     );
                 } else {
-                    $message = $this->translate->_(
+                    $message = $this->_translate->_(
                         'Received data of resource %1$s from Google Geocoder contains response: %2$s.'
                         . ' No Statements were added.',
                         $this->_config->languages->locale
                     );
-                    $statuscodeDesc = $this->translate->_(
+                    $statuscodeDesc = $this->_translate->_(
                         'GEOCODER_GOOGLE_STATUS_' . $coordinates['statusCode'],
                         $this->_config->languages->locale
                     );
@@ -288,7 +288,7 @@ class GeocoderController extends OntoWiki_Controller_Component
             $actionSpec['resourceuri']  = $uri;
 
             $versioning->startAction($actionSpec);
-            $result = $this->model->addMultipleStatements($statements);
+            $result = $this->_model->addMultipleStatements($statements);
             $versioning->endAction($actionSpec);
             return true;
         }

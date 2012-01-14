@@ -31,6 +31,9 @@ class GeoservicesController extends OntoWiki_Controller_Component
      */
     protected $_resourceUri = null;
 
+    private $_model;
+    private $_store;
+
 
     public function init()
     {
@@ -38,12 +41,11 @@ class GeoservicesController extends OntoWiki_Controller_Component
         if (is_object($this->_owApp->selectedResource)) {
             $this->resource = $this->_owApp->selectedResource->getIri();
         }
-        $this->model    = $this->_owApp->selectedModel;
-        $this->store    = $this->_erfurt->getStore();
+        $this->_model    = $this->_owApp->selectedModel;
+        $this->_store    = $this->_erfurt->getStore();
 
         if ($this->_owApp->selectedResource instanceof Erfurt_Rdf_Resource) {
-            $this->_resource = $this->_owApp->selectedResource;
-            $this->_resourceUri = $this->_resource->getUri();
+            $this->_resource = $this->_owApp->selectedResource->getUri();
         }
     }
 
@@ -61,7 +63,7 @@ class GeoservicesController extends OntoWiki_Controller_Component
 
         $searchString = $searchStringShort = $this->_request->q;
 
-        $uri = $this->_resourceUri;
+        $uri = $this->_resource;
         if (empty($searchString)) {
             /**
              * $instance contains string to check if suitable for direct geocoding
@@ -90,7 +92,7 @@ class GeoservicesController extends OntoWiki_Controller_Component
             OPTIONAL
             { <" . $uri . "> <" . $countryProperty . "> ?country}
         }";
-            $resource = $this->model->sparqlQuery($qr);
+            $resource = $this->_model->sparqlQuery($qr);
             $instance = $resource[0];
 
             $searchString = $instance['street'];
@@ -100,7 +102,7 @@ class GeoservicesController extends OntoWiki_Controller_Component
 
             // Use the TitleHelper to get the actual strings for cities and countries
             //require_once 'OntoWiki/Model/TitleHelper.php';
-            $titleHelper = new OntoWiki_Model_TitleHelper($this->model);
+            $titleHelper = new OntoWiki_Model_TitleHelper($this->_model);
             $titleHelper->addResource($instance['city']);
             $titleHelper->addResource($instance['country']);
 
@@ -148,8 +150,8 @@ class GeoservicesController extends OntoWiki_Controller_Component
         include('extensions/components/map/classes/Marker.php');
         $markers = array();
 
-        foreach (OntoWiki::getInstance()->session->gcResult[$this->_resourceUri] as $gcResult) {
-            $marker = new Marker($this->_resourceUri . "/" . $gcResult['label']);
+        foreach (OntoWiki::getInstance()->session->gcResult[$this->_resource] as $gcResult) {
+            $marker = new Marker($this->_resource . "/" . $gcResult['label']);
             $marker->setLat($gcResult[0]['lat']);
             $marker->setLon($gcResult[0]['lon']);
             $marker->setIcon(null);
@@ -170,8 +172,8 @@ class GeoservicesController extends OntoWiki_Controller_Component
 
         $this->_owApp->logger->debug('Geocoding/storecoordsAction action called');
 
-        if ($this->model->isEditable()) {
-            $uri = $this->_resourceUri;
+        if ($this->_model->isEditable()) {
+            $uri = $this->_resource;
 
             $longitudeProps = $this->_privateConfig->property->longitude->toArray();
             $latitudeProps = $this->_privateConfig->property->latitude->toArray();
@@ -199,10 +201,10 @@ class GeoservicesController extends OntoWiki_Controller_Component
             $actionSpec['resourceuri']  = $uri;
 
             $versioning->startAction($actionSpec);
-            $result = $this->model->deleteMatchingStatements($uri, $longitudeProps[0], null);
-            $result = $this->model->deleteMatchingStatements($uri, $latitudeProps[0], null);
-            $result = $this->model->deleteMatchingStatements($uri, $accuracyProps[0], null);
-            $result = $this->model->addMultipleStatements($statementsAdd);
+            $result = $this->_model->deleteMatchingStatements($uri, $longitudeProps[0], null);
+            $result = $this->_model->deleteMatchingStatements($uri, $latitudeProps[0], null);
+            $result = $this->_model->deleteMatchingStatements($uri, $accuracyProps[0], null);
+            $result = $this->_model->addMultipleStatements($statementsAdd);
             $versioning->endAction($actionSpec);
 
             // This variant using SPARQL Update language did not work reliable

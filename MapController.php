@@ -1,23 +1,28 @@
 <?php
 
 /**
- * Map component controller.
+ * Map, Geocode, Geoservices and Geocoding component controller.
  *
  * @category OntoWiki
  * @package OntoWiki_extensions_components_map
  * @author Natanael Arndt <arndtn@gmail.com>
+ * @author Claudius Henrichs <chenrichs@gmail.com>
  * TODO comments
  */
+
+require_once ('classes/GeocodingResult.php');
+
 class MapController extends OntoWiki_Controller_Component
 {
 
     private $_model;
-    private $_resource;
+    private $_resource      = null;
     private $_store;
-    private $_listHelper = null;
-    private $_instances = null;
-    private $_resources = null;
-    private $_resourceVar = 'resource';
+    private $_listHelper    = null;
+    private $_instances     = null;
+    private $_resources     = null;
+    private $_resourceVar   = 'resource';
+    private $_translate;
 
     public static $maxResources = 1000;
 
@@ -25,12 +30,21 @@ class MapController extends OntoWiki_Controller_Component
     {
         $logger = OntoWiki::getInstance()->logger;
         $logger->debug('Initializing MapPlugin Controller');
+
         parent::init();
-        if (is_object($this->_owApp->selectedResource)) {
-            $this->_resource = $this->_owApp->selectedResource->getIri();
+
+        $resource = $this->_owApp->selectedResource;
+        if (is_object($resource) && $resource instanceof Erfurt_Rdf_Resource) {
+            $this->_resource = $resource->getIri();
         }
-        $this->_model    = $this->_owApp->selectedModel;
-        $this->_store    = $this->_erfurt->getStore();
+        $this->_model       = $this->_owApp->selectedModel; // TODO: check if model is selected before
+        $this->_store       = $this->_erfurt->getStore();
+        $this->_translate   = $this->_owApp->translate;
+    }
+
+    public function __call($method, $args)
+    {
+        $this->_forward('view');
     }
 
     public function displayAction()
@@ -245,10 +259,10 @@ class MapController extends OntoWiki_Controller_Component
                 $bnd[$key] = new Erfurt_Sparql_Query2_RDFLiteral($_bnd, $datatype);
             }
 
-            $bnd['top'] = new Erfurt_Sparql_Query2_Smaller('?lat',  $bnd['top']);
+            $bnd['top'] = new Erfurt_Sparql_Query2_Smaller('?lat', $bnd['top']);
             $bnd['rgt'] = new Erfurt_Sparql_Query2_Smaller('?long', $bnd['rgt']);
-            $bnd['btm'] = new Erfurt_Sparql_Query2_Larger('?lat',   $bnd['btm']);
-            $bnd['lft'] = new Erfurt_Sparql_Query2_Larger('?long',  $bnd['lft']);
+            $bnd['btm'] = new Erfurt_Sparql_Query2_Larger('?lat', $bnd['btm']);
+            $bnd['lft'] = new Erfurt_Sparql_Query2_Larger('?long', $bnd['lft']);
             $dttyps[]   = new Erfurt_Sparql_Query2_ConditionalAndExpression($bnd);
         }
         $filter = new Erfurt_Sparql_Query2_Filter(new Erfurt_Sparql_Query2_ConditionalOrExpression($dttyps));
@@ -256,10 +270,189 @@ class MapController extends OntoWiki_Controller_Component
         $this->_session->instances->addTripleFilter($filter, "mapBounds");
     }
 
-    public function __call($method, $args)
+
+    /**
+     * Polls geocoding services for location information using the ressource's address as query and using JSON requests
+     * from: GeoserviceController
+     */
+    public function geocodeAction()
     {
-        $this->_forward('view');
+        // tells the OntoWiki to not apply the template to this action
+        $this->_helper->viewRenderer->setNoRender();
+        $this->_helper->layout->disableLayout();
+
+        $this->_owApp->logger->debug('Geocoding/geocodeAction action called');
+
+        $searchString = $searchStringShort = $this->_request->q;
+
+        $uri = $this->_resource;
+        if (empty($searchString)) {
+            /**
+             * $instance contains string to check if suitable for direct geocoding
+             * $searchString contains, address, city and country, if found
+             * $searchStringShort city and country only
+             */
+
+            /**
+             * Read property values from module's configuration
+             */
+            $streetProperties      = $this->_privateConfig->property->street->toArray();
+            $housenumberProperties     = $this->_privateConfig->property->housenumber->toArray();
+            $cityProperties      = $this->_privateConfig->property->city->toArray();
+            $countryProperties     = $this->_privateConfig->property->country->toArray();
+            $streetProperty        = $streetProperties[0];
+            $housenumberProperty       = $housenumberProperties[0];
+            $cityProperty        = $cityProperties[0];
+            $countyProperty       = $countryProperties[0];
+
+            $qr = "SELECT * WHERE {
+            { <" . $uri . "> <" . $streetProperty . "> ?street}
+            OPTIONAL
+            { <" . $uri . "> <" . $housenumberProperty . "> ?housenumber}
+            OPTIONAL
+            { <" . $uri . "> <" . $cityProperty . "> ?city}
+            OPTIONAL
+            { <" . $uri . "> <" . $countryProperty . "> ?country}
+        }";
+            $resource = $this->_model->sparqlQuery($qr);
+            $instance = $resource[0];
+
+            $searchString = $instance['street'];
+            $searchString = empty($searchString) ?
+                $instance['housenumber'] :
+                $searchString . " " . (string)$instance['housenumber'];
+
+            // Use the TitleHelper to get the actual strings for cities and countries
+            //require_once 'OntoWiki/Model/TitleHelper.php';
+            $titleHelper = new OntoWiki_Model_TitleHelper($this->_model);
+            $titleHelper->addResource($instance['city']);
+            $titleHelper->addResource($instance['country']);
+
+            $searchStringShort = $titleHelper->getTitle($instance['city']);
+            $searchStringShort .= ", " . $titleHelper->getTitle($instance['country']);
+
+            $searchString .= ", " . $searchStringShort;
+        }
+
+        // Create the singleton for the resultset
+        $geocodingResult = GeocodingResult::getInstance();
+
+        // Check which geocoders are available
+        foreach ($this->_privateConfig->active_geocoders->toArray() as $geocoder) {
+            require_once $this->_componentRoot . 'geocoder_services/' . $geocoder . '.php';
+
+            eval('$geocoderService = new '.ucfirst($geocoder) . '_service;');
+            $geocoderResult = $geocoderService->servicepollaction($searchString, $searchStringShort, $uri);
+            if ($geocoderResult) {
+                //array_push($data, $geocoderResult);
+                $geocodingResult->pushData($geocoderResult);
+            }
+        }
+
+        // $this->_response->setHeader('Content-Type', 'application/json', true);
+        $this->_response->setBody(json_encode($geocodingResult->getResultset()));
+
+        OntoWiki::getInstance()->session->gcResult[$uri] = $geocodingResult->getResultset();
+
+        return true;
     }
+
+    /**
+     * Sends the previously geocoded markerdata for an uri in a map-component compatible format
+     * from: GeoserviceController
+     */
+    public function getmarkerAction()
+    {
+        // tells the OntoWiki to not apply the template to this action
+        $this->_helper->viewRenderer->setNoRender();
+        $this->_helper->layout->disableLayout();
+
+        $this->_owApp->logger->debug('Geocoding/getmarkerAction action called');
+
+        // Marker-class from Map-component to create set of markers
+        include('extensions/components/map/classes/Marker.php');
+        $markers = array();
+
+        foreach (OntoWiki::getInstance()->session->gcResult[$this->_resource] as $gcResult) {
+            $marker = new Marker($this->_resource . "/" . $gcResult['label']);
+            $marker->setLat($gcResult[0]['lat']);
+            $marker->setLon($gcResult[0]['lon']);
+            $marker->setIcon(null);
+            $markers[] = $marker;
+        }
+
+        $this->_response->setBody(json_encode($markers));
+    }
+
+    /**
+     * Saves lat/lon data passed in request parameter "coordinates" into the model
+     * from: GeoserviceController
+     */
+    public function storecoordsAction()
+    {
+        // tells the OntoWiki to not apply the template to this action
+        $this->_helper->viewRenderer->setNoRender();
+        $this->_helper->layout->disableLayout();
+
+        $this->_owApp->logger->debug('Geocoding/storecoordsAction action called');
+
+        if ($this->_model->isEditable()) {
+            $uri = $this->_resource;
+
+            $longitudeProps = $this->_privateConfig->property->longitude->toArray();
+            $latitudeProps = $this->_privateConfig->property->latitude->toArray();
+            $accuracyProps = $this->_privateConfig->property->accuracy->toArray();
+
+            $coordinates = $this->_request->coordinates;
+            $coordinatearray = explode(",", $coordinates);
+
+            $predicates = array();
+            $longitude = array('value' => $coordinatearray[1], 'type' => 'literal', 'datatype' => "xsd:float");
+
+            $latitude = array('value' => $coordinatearray[0], 'type' => 'literal', 'datatype' => "xsd:float");
+
+            $accuracy = array('value' => $this->_request->accuracy, 'type' => 'literal','datatype' => "xsd:float");
+
+            $predicates[$longitudeProps[0]][] = $longitude;
+            $predicates[$latitudeProps[0]][] = $latitude;
+            $predicates[$accuracyProps[0]][] = $accuracy;
+            $statementsAdd = array( $uri => $predicates );
+
+            $versioning                 = $this->_erfurt->getVersioning();
+            $actionSpec                 = array();
+            $actionSpec['type']         = 666;
+            $actionSpec['modeluri']     = (string) $this->_owApp->selectedModel;
+            $actionSpec['resourceuri']  = $uri;
+
+            $versioning->startAction($actionSpec);
+            $result = $this->_model->deleteMatchingStatements($uri, $longitudeProps[0], null);
+            $result = $this->_model->deleteMatchingStatements($uri, $latitudeProps[0], null);
+            $result = $this->_model->deleteMatchingStatements($uri, $accuracyProps[0], null);
+            $result = $this->_model->addMultipleStatements($statementsAdd);
+            $versioning->endAction($actionSpec);
+
+            // This variant using SPARQL Update language did not work reliable
+            /*  $modelUri = $this->_owApp->selectedModel->getModelIri();
+
+            $sparULstring = 'INSERT DATA INTO <' . $modelUri . '> {<'
+                . $uri . '> <' . $longitudeProps[0] . '> "' . $coordinatearray[1]
+                . '" .} DELETE DATA FROM <' . $modelUri . '> {<' . $uri . '> <' . $longitudeProps[0] . '> <*> .}';
+
+            $url = $this->_config->urlBase . "update/?query=" . urlencode($sparULstring);
+
+            $output = @file_get_contents($url);
+            */
+
+            $output = array('status' => 'OK');
+            $this->_response->setBody(json_encode($output));
+        } else {
+            $output = array('status' => 'ERROR', 'message' => 'permission denied');
+            $this->_response->setBody(json_encode($output));
+        }
+
+        return true;
+    }
+
 
     /**
      * Get the markers in the specified area
@@ -358,8 +551,8 @@ class MapController extends OntoWiki_Controller_Component
             /**
              * merge theses two results
              */
-            //$resourcesDir = $this->cpVarToKey($resourcesDir, $this->_resourceVar);
-            //$resourcesInd = $this->cpVarToKey($resourcesInd, $this->_resourceVar);
+            //$resourcesDir = $this->_cpVarToKey($resourcesDir, $this->_resourceVar);
+            //$resourcesInd = $this->_cpVarToKey($resourcesInd, $this->_resourceVar);
 
             $this->_resources = array_merge_recursive($resourcesDir, $resourcesInd);
 
@@ -480,7 +673,7 @@ class MapController extends OntoWiki_Controller_Component
      * @param array $array The Resultset, which is returned by a sparqlquery
      * @param String $key of the array element holding the URI
      */
-    private function cpVarToKey($array, $key)
+    private function _cpVarToKey($array, $key)
     {
         for ($i = 0; $i < count($array); $i++) {
             if (isset($array[$array[$i][$key]])) {

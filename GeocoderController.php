@@ -16,8 +16,8 @@ require_once 'OntoWiki/Controller/Component.php';
  */
 class GeocoderController extends OntoWiki_Controller_Component
 {
-    private $_model = null; // unused
-    private $_translate = null; // unused
+    private $_model = null;
+    private $_translate = null;
 
     // ------------------------------------------------------------------------
     // --- Component initialization -------------------------------------------

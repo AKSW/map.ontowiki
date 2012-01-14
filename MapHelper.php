@@ -23,7 +23,9 @@ class MapHelper extends OntoWiki_Component_Helper
 
     public function init()
     {
-        $logger = OntoWiki::getInstance()->logger;
+        $owApp = OntoWiki::getInstance();
+
+        $logger = $owApp->logger;
         $logger->debug('Initializing MapPlugin Helper');
 
         // decide, if map should be on
@@ -59,10 +61,9 @@ class MapHelper extends OntoWiki_Component_Helper
         }
 
         /**
-         * From GeoCoder
+         * From Geocoder
          */
 
-        $owApp = OntoWiki::getInstance();
         // if a model has been selected
         if ($owApp->selectedModel != null) {
             // register with extras menu
@@ -70,7 +71,7 @@ class MapHelper extends OntoWiki_Component_Helper
             $appMenu        = OntoWiki_Menu_Registry::getInstance()->getMenu('application');
             $extrasMenu     = $appMenu->getSubMenu('Extras');
             $geoCoderLabel  = $this->translate->_('Geo Coder', $owApp->config->languages->locale);
-            $geoCoderUrl    = $owApp->urlBase . 'geocoder/init';
+            $geoCoderUrl    = $owApp->urlBase . 'geocoder/init'; // TODO fix this url
             $extrasMenu->setEntry($geoCoderLabel, $geoCoderUrl);
         }
     }

@@ -16,8 +16,8 @@ require_once 'OntoWiki/Controller/Component.php';
  */
 class GeocoderController extends OntoWiki_Controller_Component
 {
-    private $model = null;
-    private $translate = null;
+    private $_model = null; // unused
+    private $_translate = null; // unused
 
     // ------------------------------------------------------------------------
     // --- Component initialization -------------------------------------------
@@ -29,7 +29,7 @@ class GeocoderController extends OntoWiki_Controller_Component
         if ((!isset($this->_request->m)) && (!$this->_owApp->selectedModel)) {
             require_once 'OntoWiki/Exception.php';
             throw new OntoWiki_Exception('No model pre-selected and missing parameter m (model)!');
-            exit;
+            return();
         } else {
             $this->model = $this->_owApp->selectedModel;
         }
@@ -42,7 +42,9 @@ class GeocoderController extends OntoWiki_Controller_Component
         $this->translate = $this->_owApp->translate;
 
         //set title of main window ...
-        $this->view->placeholder('main.window.title')->set($this->translate->_('Geo Coder', $this->_config->languages->locale));
+        $this->view->placeholder('main.window.title')->set(
+            $this->translate->_('Geo Coder', $this->_config->languages->locale)
+        );
     }
 
     /**
@@ -50,12 +52,19 @@ class GeocoderController extends OntoWiki_Controller_Component
      * @access private
      *
      */
-    public function initAction() {
+    public function initAction()
+    {
         // create a new button on the toolbar
         $toolbar = $this->_owApp->toolbar;
         $toolbar->appendButton(
             OntoWiki_Toolbar::SUBMIT,
-            array('name' => $this->translate->_('Start GeoCoder', $this->_config->languages->locale), 'id' => 'geocoder')
+            array(
+                'name' => $this->translate->_(
+                    'Start GeoCoder',
+                    $this->_config->languages->locale
+                ),
+                'id' => 'geocoder'
+            )
         );
         $this->view->placeholder('main.window.toolbar')->set($toolbar);
         $this->view->formActionUrl = $this->_config->urlBase . 'geocoder/google';
@@ -67,14 +76,15 @@ class GeocoderController extends OntoWiki_Controller_Component
     }
 
     /**
-     * Specific action which receives geo coordinates from google geocoder by specific addressdata delivered by a SPARQL Query.
-     * Received data will be saved as lon/lat as properties to the given Uri (uri also assigned in the SPARQL query)
+     * Specific action which receives geo coordinates from google geocoder by specific addressdata delivered by
+     * a SPARQL Query. Received data will be saved as lon/lat as properties to the given Uri (uri also assigned
+     * in the SPARQL query)
      * @access private
      * @author     Michael Martin <martin@informatik.uni-leipzig.de>
      * 
      */
-    public function googleAction() {
-
+    public function googleAction()
+    {
         $query = "";
         // fetch query parameter
         if (isset($this->_request->query)) {
@@ -83,7 +93,7 @@ class GeocoderController extends OntoWiki_Controller_Component
 
             $this->_response->setRawHeader('HTTP/1.0 400 Bad Request');
             echo '400 Bad Request - No Query Parameter in Request found.';
-            exit;
+            return();
         }
 
         $toolbar = $this->_owApp->toolbar;
@@ -104,30 +114,32 @@ class GeocoderController extends OntoWiki_Controller_Component
                 $this->minAccuracy = $acc;
             }
         }
-		$simpleQuery = Erfurt_Sparql_SimpleQuery::initWithString($query);
+        $simpleQuery = Erfurt_Sparql_SimpleQuery::initWithString($query);
 
-		$options['result_format'] = "plain";
-		$options['use_ac'] = false;
+        $options['result_format'] = "plain";
+        $options['use_ac'] = false;
         try {
-    		$result = $this->model->sparqlQuery( $simpleQuery,  $options );
+            $result = $this->model->sparqlQuery($simpleQuery, $options);
         } catch (Exception $e) {
-            $this->_owApp->appendMessage(new OntoWiki_Message(
-                ($this->translate->_('Query is not valid. Received Message:', $this->_config->languages->locale)).$e->getMessage(), 
-                OntoWiki_Message::ERROR));
+            $this->_owApp->appendMessage(
+                new OntoWiki_Message(
+                    ($this->translate->_('Query is not valid. Received Message:', $this->_config->languages->locale))
+                    . $e->getMessage(),
+                    OntoWiki_Message::ERROR
+                )
+            );
             return false;
         }
 
-        if (sizeOf($result) == 0)
-        {
-            $this->_owApp->appendMessage(new OntoWiki_Message(
-                ($this->translate->_('No Data found for this query.', $this->_config->languages->locale)), 
-                OntoWiki_Message::ERROR));
+        if (sizeOf($result) == 0) {
+            $this->_owApp->appendMessage(
+                new OntoWiki_Message(
+                    ($this->translate->_('No Data found for this query.', $this->_config->languages->locale)),
+                    OntoWiki_Message::ERROR
+                )
+            );
             return false;
         }
-
-
-
-
 
         require_once 'OntoWiki/Model/TitleHelper.php';
         $titleHelper = new OntoWiki_Model_TitleHelper($this->_owApp->selectedModel);
@@ -141,26 +153,50 @@ class GeocoderController extends OntoWiki_Controller_Component
             $resourceURL = new OntoWiki_Url(array('route' => 'properties'), array('r'));
             $resourceURL->setParam('r', $uri, true);
             $resourceLink = '<a href="'.$resourceURL.'">'.$resourceLabel.'</a>';
-            $address = implode (" ", $entry);
+            $address = implode(" ", $entry);
             $coordinates = $this->_getCoordinatesFromGoogle($address);
             if ($coordinates['statusCode'] == 620) {
                 //geocoding day limit reached
-                $this->_owApp->appendMessage(new OntoWiki_Message($this->translate->_('GEOCODER_GOOGLE_STATUS_620', $this->_config->languages->locale), OntoWiki_Message::ERROR));
+                $this->_owApp->appendMessage(
+                    new OntoWiki_Message(
+                        $this->translate->_('GEOCODER_GOOGLE_STATUS_620', $this->_config->languages->locale),
+                        OntoWiki_Message::ERROR
+                    )
+                );
                 break;
             }
 
                 $writeResult = $this->_writeCoordinates($uri, $coordinates);
                 if ($writeResult == true) {
-                    $message = $this->translate->_('Accurate coordinates received for resource %1$s. 2 Statements were added.', $this->_config->languages->locale);
+                    $message = $this->translate->_(
+                        'Accurate coordinates received for resource %1$s. 2 Statements were added.',
+                        $this->_config->languages->locale
+                    );
                     $this->_owApp->appendMessage(
-                        new OntoWiki_Message(sprintf($message, $resourceLink), OntoWiki_Message::SUCCESS,array('escape'    => false))
+                        new OntoWiki_Message(
+                            sprintf($message, $resourceLink),
+                            OntoWiki_Message::SUCCESS,
+                            array('escape'    => false)
+                        )
                     );
                 } else {
-                    $message = $this->translate->_('Received data of resource %1$s from Google Geocoder contains response: %2$s. No Statements were added.', $this->_config->languages->locale);
-                    $statuscodeDesc = $this->translate->_('GEOCODER_GOOGLE_STATUS_'.$coordinates['statusCode'],$this->_config->languages->locale);
-                    $response = "STATUSCODE: ".$coordinates['statusCode']."( ".$statuscodeDesc." ), ACCURACY:".$coordinates['accuracy'];
+                    $message = $this->translate->_(
+                        'Received data of resource %1$s from Google Geocoder contains response: %2$s.'
+                        . ' No Statements were added.',
+                        $this->_config->languages->locale
+                    );
+                    $statuscodeDesc = $this->translate->_(
+                        'GEOCODER_GOOGLE_STATUS_' . $coordinates['statusCode'],
+                        $this->_config->languages->locale
+                    );
+                    $response = "STATUSCODE: " . $coordinates['statusCode'] . "( " . $statuscodeDesc . " ), ACCURACY:"
+                        . $coordinates['accuracy'];
                     $this->_owApp->appendMessage(
-                        new OntoWiki_Message(sprintf($message, $resourceLink, $response), OntoWiki_Message::ERROR,array('escape'    => false))
+                        new OntoWiki_Message(
+                            sprintf($message, $resourceLink, $response),
+                            OntoWiki_Message::ERROR,
+                            array('escape'    => false)
+                        )
                     );
                 }
         }
@@ -174,42 +210,42 @@ class GeocoderController extends OntoWiki_Controller_Component
      * @return array   $latLng     Array of geocoder results with statuscode, longitude, latitude, accuracy
      * 
      */
-    private function _getCoordinatesFromGoogle( $address = "") {
-        $googleMapKey = $this->_privateConfig->googleMapKey;
-		$addressData	= urlencode( $address);
-		$geocoder		= "http://maps.google.nl/maps/geo?q=".$addressData."&output=xml&key=".$googleMapKey;
-		$kml			= file_get_contents( $geocoder );
-		$xml			= new SimpleXMLElement( utf8_encode( $kml ) );
+    private function _getCoordinatesFromGoogle($address = "")
+    {
+        $googleMapKey   = $this->_privateConfig->apikey->google;
+        $addressData    = urlencode($address);
+        $geocoder       = "http://maps.google.nl/maps/geo?q=".$addressData."&output=xml&key=".$googleMapKey;
+        $kml            = file_get_contents($geocoder);
+        $xml            = new SimpleXMLElement(utf8_encode($kml));
 
-		$latLng			= array(
-			'statusCode'	=> 0,
-			'longitude'		=> 0,
-			'latitude'		=> 0,
-			'accuracy'		=> 0,
-		);
+        $latLng         = array(
+            'statusCode' => 0,
+            'longitude'  => 0,
+            'latitude'   => 0,
+            'accuracy'   => 0,
+        );
 
         if (sizeof($xml->Response->Placemark) > 1) {
             $latLng['statusCode'] = 100;
             return $latLng;
         }
 
-		$statusCode		= (string) $xml->Response->Status->code;
+        $statusCode     = (string) $xml->Response->Status->code;
         $latLng['statusCode'] = $statusCode;
 
+        if ($statusCode == 200) {
 
-		if( $statusCode == 200) {
-
-			list( $longitude, $latitude, $altitude ) = explode( ",", $xml->Response->Placemark->Point->coordinates );
-			$latLng['longitude']	= $longitude;
-			$latLng['latitude']		= $latitude;
-			$attributes				= $xml->Response->Placemark->AddressDetails->attributes();
-			foreach( $attributes as $key => $value ) {
-				if( $key == "Accuracy" ) {
-					$latLng['accuracy']	= (string) $value;
+            list($longitude, $latitude, $altitude) = explode(",", $xml->Response->Placemark->Point->coordinates);
+            $latLng['longitude']    = $longitude;
+            $latLng['latitude']     = $latitude;
+            $attributes             = $xml->Response->Placemark->AddressDetails->attributes();
+            foreach ($attributes as $key => $value) {
+                if ($key == "Accuracy") {
+                    $latLng['accuracy']    = (string) $value;
                 }
             }
-		}
-		return $latLng;
+        }
+        return $latLng;
     }
 
     /**
@@ -221,25 +257,29 @@ class GeocoderController extends OntoWiki_Controller_Component
      * @return boolean  
      * 
      */
-    private function _writeCoordinates($uri, $coordinates) {
-        if ($coordinates["statusCode"] == 200 && ($coordinates["accuracy"] >= $this->minAccuracy) ) {
+    private function _writeCoordinates($uri, $coordinates)
+    {
+        if ($coordinates["statusCode"] == 200 && ($coordinates["accuracy"] >= $this->minAccuracy)) {
 
             $predicates = array();
-			$longitude = array(
-				'value'	=> $coordinates['longitude'],
-				'type'	=> 'literal',
+            $longitude = array(
+                'value'    => $coordinates['longitude'],
+                'type'    => 'literal',
                 'datatype' => "xsd:float"
-			);
-			
-			$latitude = array(
-				'value'	=> $coordinates['latitude'],
-				'type'	=> 'literal',
-                'datatype' => "xsd:float"
-			);
+            );
 
-            $predicates[$this->_privateConfig->longitude][] = $longitude;
-            $predicates[$this->_privateConfig->latitude][] = $latitude;
-		    $statements = array( $uri => $predicates );
+            $latitude = array(
+                'value'    => $coordinates['latitude'],
+                'type'    => 'literal',
+                'datatype' => "xsd:float"
+            );
+
+            $longitudeProp = $this->_privateConfig->property->longitude->toArray();
+            $latitudeProp = $this->_privateConfig->property->latitude->toArray();
+
+            $predicates[$longitudeProp[0]][] = $longitude;
+            $predicates[$latitudeProp[0]][] = $latitude;
+            $statements = array($uri => $predicates);
 
             $versioning                 = $this->_erfurt->getVersioning();
             $actionSpec                 = array();
@@ -248,10 +288,10 @@ class GeocoderController extends OntoWiki_Controller_Component
             $actionSpec['resourceuri']  = $uri;
 
             $versioning->startAction($actionSpec);
-            $result = $this->model->addMultipleStatements( $statements );
+            $result = $this->model->addMultipleStatements($statements);
             $versioning->endAction($actionSpec);
             return true;
-		}
+        }
         return false;
     }
 }

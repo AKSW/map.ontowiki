@@ -280,7 +280,7 @@ class MapModule extends OntoWiki_Module
             $instance['postcode'] = $titleHelper->getTitle($instance['postcode']);
 
             if (!empty($instance['accuracy'])) {
-                $data['accuracy']    = $instance['accuracy'];
+                $data['accuracy'] = $instance['accuracy'];
             } else {
                 $data['accuracy'] = null;
             }
@@ -293,11 +293,12 @@ class MapModule extends OntoWiki_Module
             $data['searchString'] = "";
             $data['accuracy']    = null;
         }
-        $data['urlBase']    = $this->_config->urlBase;
-        $data['controller']    = $this->_request->getControllerName();
-        $data['action']        = $this->_request->getActionName();
-        $data['accuracyLimit']    = $this->_privateConfig->geocodeAccuracyLimit;
-        $content        = $this->render('templates/geocode', $data, 'data');
+        $data['urlBase']        = $this->_config->urlBase;
+        $data['controller']     = $this->_request->getControllerName();
+        $data['action']         = $this->_request->getActionName();
+        $data['accuracyLimit']  = $this->_privateConfig->geocodeAccuracyLimit;
+
+        $content = $this->render('templates/geocode', $data, 'data');
 
         return $content;
     }

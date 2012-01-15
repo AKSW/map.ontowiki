@@ -9,6 +9,7 @@
  * @author Claudius Henrichs <chenrichs@gmail.com>
  * @version $Id$
  * TODO comments
+ * TODO yahoo seams not to be available anymore
  */
 class GeocoderService_Yahoo implements GeocoderService
 {

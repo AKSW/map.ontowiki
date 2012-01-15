@@ -11,6 +11,7 @@
  */
 
 require_once ('classes/GeocodingResult.php');
+require_once ('classes/GeocoderService.php');
 
 class MapController extends OntoWiki_Controller_Component
 {
@@ -339,9 +340,9 @@ class MapController extends OntoWiki_Controller_Component
 
         // Check which geocoders are available
         foreach ($this->_privateConfig->active_geocoders->toArray() as $geocoder) {
-            require_once $this->_componentRoot . 'geocoder_services/' . $geocoder . '.php';
+            require_once $this->_componentRoot . 'classes/GeocoderService/' . ucfirst($geocoder) . '.php';
 
-            eval('$geocoderService = new '.ucfirst($geocoder) . '_service;');
+            eval('$geocoderService = new GeocoderService_' . ucfirst($geocoder) . ';');
             $geocoderResult = $geocoderService->servicepollaction($searchString, $searchStringShort, $uri);
             if ($geocoderResult) {
                 //array_push($data, $geocoderResult);

@@ -28,7 +28,7 @@ class GeocoderService_Nominatim implements GeocoderService
         // Build the URL to send the geocoding request to
         $url  = "http://nominatim.openstreetmap.org/search?format=json&polygon=0&addressdetails=0&email="
             . $contactEmail
-            . "&q=";
+            . "&q="
             . urlencode($searchstring);
 
         // Send the request

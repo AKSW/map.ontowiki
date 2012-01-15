@@ -38,7 +38,7 @@ class BingMaps
 }
 
 
-class Geocoderervice_Bing implements Geocoderervice
+class GeocoderService_Bing implements GeocoderService
 {
     public function servicepollaction ($searchstring, $searchstringShort, $uri)
     {
@@ -52,6 +52,7 @@ class Geocoderervice_Bing implements Geocoderervice
         //Counter for multiple result entries
         $resultcounter = 0;
 
+        // TODO: fix API, xml-layout seams to has changed
         while (isset($result->Locations->GeocodeLocation[$resultcounter]->Latitude) && $resultcounter < 10 ) {
             $data[$resultcounter]['name'] = $result->Address->FormattedAddress;
             $data[$resultcounter]['lat'] = $result->Locations->GeocodeLocation[$resultcounter]->Latitude;

@@ -8,11 +8,10 @@ require_once $this->_componentRoot . 'classes/Marker.php';
  *
  * TODO Caching!!!
  *
- * @category   OntoWiki
- * @package    OntoWiki_extensions_components_map
- * @author OW MapPlugin-Team <mashup@comiles.eu>
- * @version 1.0.0
- * @package MapPlugin
+ * @category    OntoWiki
+ * @package     OntoWiki_extensions_components_map
+ * @author      OW MapPlugin-Team <mashup@comiles.eu>
+ * @author      Natanael Arndt <arndtn@gmail.com>
  */
 class GeoCoder
 {
@@ -141,12 +140,15 @@ class GeoCoder
             $uri = $marker->getUri();
         }
         if ($depth < $this->_maxIndirectDepth) {
+            $latProperties  = $this->_privateConfig->property->latitude->toArray();
+            $longProperties = $this->_privateConfig->property->longitude->toArray();
+
             $qr = "SELECT * WHERE {
                 { <" . $uri . "> <http://3ba.se/conferences/inConjunctionWith> ?inConjunctionWith}
                 UNION
                 { <" . $uri . "> 
-                    <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?lon; 
-                    <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat}
+                    <" . $longProperties[0] . "> ?lon; 
+                    <" . $latProperties[0] . "> ?lat}
 
             }";
             $resource = $this->_model->sparqlQuery($qr);
@@ -161,7 +163,7 @@ class GeoCoder
             } else if (get_class($instance['inConjunctionWith']) == "Erfurt_Rdfs_Literal_Default") {
                 if ($this->directGeoCode($model, $instance['inConjunctionWith']->getURI())) {
                     return true;
-                } else if ($this->indirectGeoCode($model, $instance['inConjunctionWith']->getURI(), $depth+1)) {
+                } else if ($this->indirectGeoCode($model, $instance['inConjunctionWith']->getURI(), $depth + 1)) {
                     return true;
                 } else {
                     return false;

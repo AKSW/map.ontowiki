@@ -4,10 +4,12 @@
  * OntoWiki module – minimap
  *
  * display a minimap of the currently visible resources (if any)
+ * shows a short statistical summary about geographical data in a ressource
  *
  * @category OntoWiki
  * @package OntoWiki_extensions_components_map
  * @author Natanael Arndt <arndtn@gmail.com>
+ * @author Claudius Henrichs <chenrichs@gmail.com>
  * @copyright Copyright (c) 2008, {@link http://aksw.org AKSW}
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)
  */
@@ -57,7 +59,7 @@ class MapModule extends OntoWiki_Module
             );
         }
         // TODO should show geocode options only on single resource view
-        return $this->getGeoCodeContents() . $this->render('minimap');
+        return $this->getGeostatsContents() . $this->getGeocodeContents() . $this->render('minimap');
     }
 
     // TODO: merge with geocode shouldShow code
@@ -72,6 +74,7 @@ class MapModule extends OntoWiki_Module
         } else {
             return false;
         }
+        // geostats says always true
     }
 
     /**
@@ -136,9 +139,87 @@ class MapModule extends OntoWiki_Module
     }
 
     /**
+     * Returns the content
+     * from: Geostats module
+     */
+    public function getGeostatsContents()
+    {
+        $data['resourceUri'] = $this->_owApp->selectedResource->getIri();
+
+        $stats['typedResources'] = 0;
+        $stats['without_coords'] = 0;
+        $stats['with_coords'] = 0;
+        $stats['low_accuracy'] = 0;
+        $stats['postcode_geocoded'] = 0;
+
+        #PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        #PREFIX vak:<http://vakantieland.nl/catalogue/classes/>#
+        #PREFIX wgs:<http://www.w3.org/2003/01/geo/wgs84_pos#>
+        #Select *
+        #FROM <http://vakantieland.nl/>
+        #WHERE {
+        #?poiUri rdf:type vak:POI .
+        #OPTIONAL { ?poiUri wgs:long ?long }
+        #FILTER ( !BOUND( ?long ) )
+        #}
+
+        $longitudeProp = $this->_privateConfig->property->longitude->toArray();
+        $accuracyProp = $this->_privateConfig->property->accuracy->toArray();
+        $typeProp = $this->_privateConfig->property->type->toArray();
+
+        $poiType = $this->_privateConfig->type->poi->toArray();
+
+        $stats['typedResources'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
+            $this->_owApp->selectedResource->getIri(),
+            "WHERE { ?uri <" . $typeProp[0] . "> <" . $poiType . "> . }",
+            "?uri",
+            true
+        );
+
+        // Count ressources with geographical coordinates
+        $stats['with_coords'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
+            $this->_owApp->selectedResource->getIri(),
+            "WHERE { "
+            . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
+            . " ?uri <" . $longitudeProp[0] . "> ?long . "
+            . "}",
+            "?uri",
+            true
+        );
+
+        $stats['without_coords'] = $stats['typedResources'] - $stats['with_coords'];
+
+        // Count ressources with accuracy beween 0 and 5
+        $stats['low_accuracy'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
+            $this->_owApp->selectedResource->getIri(),
+            "WHERE { "
+            . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
+            . " ?uri <" . $accuracyProp[0] . "> ?accuracy FILTER (?accuracy < 6 && ?accuracy > -1) "
+            . "}",
+            "?uri",
+            true
+        );
+
+        // Count ressources geocoded via postcodeNL geocoder
+        $stats['postcode_geocoded'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
+            $this->_owApp->selectedResource->getIri(),
+            "WHERE { "
+            . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
+            . " ?uri <" . $accuracyProp[0] . "> ?accuracy FILTER (?accuracy < 0) "
+            . "}",
+            "?uri",
+            true
+        );
+
+        $content = $this->render('geostats', $stats, 'stats');
+
+        return $content;
+    }
+
+    /**
      * Returns the content of the geocode
      */
-    public function getGeoCodeContents()
+    public function getGeocodeContents()
     {
         $data['resourceUri'] = $this->_owApp->selectedResource->getIri();
 

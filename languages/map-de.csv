@@ -55,3 +55,9 @@ Leave manual placement mode;Manuellen Markierungsmodus verlassen
 Manually placed marker;Manuelle Markierung
 Not set;Nicht gesetzt
 Set;Markiertbenutzt
+
+Geodata statistics;Geodaten-Kurzstatistik
+Ressources with position;Ressourcen mit Koordinaten
+Ressources without position;Ressourcen ohne Koordinaten
+Low accuracy (between 0 and 6);Niedrige Genauigkeit (zwischen 0 und 6)
+Ressources geocoded via postcode;Mit PLZ geokodierte Ressourcen

@@ -507,7 +507,7 @@ class MapController extends OntoWiki_Controller_Component
                 // use the limit and offset set in the instances
             }
 
-            $query          = $this->_instances->getResourceQuery();
+            $query = $this->_instances->getResourceQuery();
 
             $query->removeAllOptionals()->removeAllProjectionVars();
 
@@ -652,22 +652,22 @@ class MapController extends OntoWiki_Controller_Component
      * Copies a uri from its value field in the resultset to the key of the array-element.
      * The $key identifies the key to the uri.
      * $array = array(
-     * 	0 => array(
-     * 		'resourceUri' => 'http://comiles.eu/~natanael/foaf.rdf#me',
-     * 		'long' => '12.3456',
-     * 		'lat' => '12.3456'
-     * 	)
+     *  0 => array(
+     *      'resourceUri' => 'http://comiles.eu/~natanael/foaf.rdf#me',
+     *      'long' => '12.3456',
+     *      'lat' => '12.3456'
+     *  )
      * );
      * $key = 'resourceUri';
      *
      * will become
      *
      * $array = array(
-     * 	'http://comiles.eu/~natanael/foaf.rdf#me' => array(
-     * 		'resourceUri' => 'http://comiles.eu/~natanael/foaf.rdf#me',
-     * 		'long' => '12.3456',
-     * 		'lat' => '12.3456'
-     * 	)
+     *  'http://comiles.eu/~natanael/foaf.rdf#me' => array(
+     *      'resourceUri' => 'http://comiles.eu/~natanael/foaf.rdf#me',
+     *      'long' => '12.3456',
+     *      'lat' => '12.3456'
+     *  )
      * );
      *
      * @param array $array The Resultset, which is returned by a sparqlquery

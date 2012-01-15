@@ -146,10 +146,10 @@ class MapHelper extends OntoWiki_Component_Helper
             if (!$front->getRequest()->isXmlHttpRequest() && $this->_listHelper->listExists($listName)) {
                 $instances = $this->_listHelper->getList($listName);
 
-                $latVar   = new Erfurt_Sparql_Query2_Var('lat');
-                $longVar  = new Erfurt_Sparql_Query2_Var('long');
-                $lat2Var  = new Erfurt_Sparql_Query2_Var('lat2');
-                $long2Var = new Erfurt_Sparql_Query2_Var('long2');
+                $latVar         = new Erfurt_Sparql_Query2_Var('lat');
+                $longVar        = new Erfurt_Sparql_Query2_Var('long');
+                $indirLatVar    = new Erfurt_Sparql_Query2_Var('lat2');
+                $indirLongVar   = new Erfurt_Sparql_Query2_Var('long2');
 
                 if ($this->_dirInstances === null) {
                     $this->_dirInstances = clone $instances;
@@ -189,8 +189,8 @@ class MapHelper extends OntoWiki_Component_Helper
                 $dirQuery->addProjectionVar($longVar);
 
                 $indQuery->addProjectionVar($this->_indInstances->getResourceVar());
-                $indQuery->addProjectionVar($lat2Var);
-                $indQuery->addProjectionVar($long2Var);
+                $indQuery->addProjectionVar($indirLatVar);
+                $indQuery->addProjectionVar($indirLongVar);
 
                 $dirQuery->addTriple($this->_dirInstances->getResourceVar(), $latProperty, $latVar);
                 $dirQuery->addTriple($this->_dirInstances->getResourceVar(), $longProperty, $longVar);
@@ -200,8 +200,8 @@ class MapHelper extends OntoWiki_Component_Helper
                 $indQuery->addTriple(
                     $this->_indInstances->getResourceVar(), new Erfurt_Sparql_Query2_Var('pred'), $node
                 );
-                $indQuery->addTriple($node, $latProperty, $lat2Var);
-                $indQuery->addTriple($node, $longProperty, $long2Var);
+                $indQuery->addTriple($node, $latProperty, $indirLatVar);
+                $indQuery->addTriple($node, $longProperty, $indirLongVar);
 
                 $owApp->logger->debug(
                     'MapHelper/shouldShow: sent "' . $dirQuery . '" to know if SpacialThings are available.'

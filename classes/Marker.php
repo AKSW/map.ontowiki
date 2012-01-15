@@ -13,7 +13,6 @@
  */
 class Marker
 {
-
     /**
      * The geo location (normaly on the earth)
      */

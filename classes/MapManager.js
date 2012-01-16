@@ -1,12 +1,12 @@
-function MapManager(mapContainer, extent, jsonUrl) {
-
+function MapManager(mapContainer, extent, jsonUrl)
+{
     /* properties */
     this.mapContainer = mapContainer;
     this.map = {};
     this.markers = false;
 
     this.extent = new OpenLayers.Bounds(extent.left, extent.bottom,
-            extent.right, extent.top);
+        extent.right, extent.top);
 
     this.jsonRequestUrl = jsonUrl;
     this.imgPath = '';
@@ -50,13 +50,14 @@ function MapManager(mapContainer, extent, jsonUrl) {
     // this.onLayerChange = onLayerChange;
 }
 
-function prepareMap() {
+function prepareMap()
+{
     OpenLayers.ImgPath = this.imgPath;
 }
 
 // initiate the map
-function initMap() {
-
+function initMap()
+{
     // for information about OpenLayers spherical mercator projection
     // seeAlso: http://docs.openlayers.org/library/spherical_mercator.html
     // seeAlso: http://openlayers.org/dev/examples/spherical-mercator.html
@@ -69,7 +70,7 @@ function initMap() {
         numZoomLevels : 18,
         maxResolution : 156543.0339,
         maxExtent : new OpenLayers.Bounds(-20037508.34, -20037508.34,
-                20037508.34, 20037508.34),
+            20037508.34, 20037508.34),
         theme : this.themePath
     };
 
@@ -84,77 +85,71 @@ function initMap() {
 
     var that = this;
 
-    OpenLayers.Util
-            .extend(
+    OpenLayers.Util.extend(
+        filterSelector,
+        {
+            draw : function()
+            {
+                this.box = new OpenLayers.Handler.Box(
                     filterSelector,
-                    {
-                        draw : function() {
-                            this.box = new OpenLayers.Handler.Box(
-                                    filterSelector, {
-                                        'done' : this.addFilter
-                                    }, {
-                                        keyMask : OpenLayers.Handler.MOD_CTRL
-                                    });
-                            this.box.activate();
-                        },
+                    {'done' : this.addFilter},
+                    {keyMask : OpenLayers.Handler.MOD_CTRL}
+                );
+                this.box.activate();
+            },
+            // TODO: diese funktion separieren
+            addFilter : function(bounds)
+            {
+                // add Filter
+                var latProp = 'http://www.w3.org/2003/01/geo/wgs84_pos#lat'; // TODO: use value from config
+                var longProp = 'http://www.w3.org/2003/01/geo/wgs84_pos#long'; // TODO: use value from config
+                var xsd = 'http://www.w3.org/2001/XMLSchema#'; // decimal';
+                // var projection = new
+                // OpenLayers.Projection("EPSG:900913");
+                // var displayProjection = new
+                // OpenLayers.Projection("EPSG:4326");
+                //
+                var topLeft = new OpenLayers.Pixel(bounds.left, bounds.top);
+                var bottomRight = new OpenLayers.Pixel(bounds.right, bounds.bottom);
+                topLeft = that.map.getLonLatFromPixel(topLeft);
+                bottomRight = that.map.getLonLatFromPixel(bottomRight);
+                topLeft.transform(that.map.projection, that.map.displayProjection);
+                bottomRight.transform(that.map.projection, that.map.displayProjection);
 
-                        // TODO: diese funktion separieren
-                        addFilter : function(bounds) {
-                            // add Filter
-                            var latProp = 'http://www.w3.org/2003/01/geo/wgs84_pos#lat';
-                            var longProp = 'http://www.w3.org/2003/01/geo/wgs84_pos#long';
-                            var xsd = 'http://www.w3.org/2001/XMLSchema#'; // decimal';
+                // alert('top-left: ' + topLeft + ' bottom-right: '
+                // + bottomRight);
 
-                            // var projection = new
-                            // OpenLayers.Projection("EPSG:900913");
-                            // var displayProjection = new
-                            // OpenLayers.Projection("EPSG:4326");
-                            //
-                            var topLeft = new OpenLayers.Pixel(bounds.left,
-                                    bounds.top);
-                            var bottomRight = new OpenLayers.Pixel(
-                                    bounds.right, bounds.bottom);
-                            topLeft = that.map.getLonLatFromPixel(topLeft);
-                            bottomRight = that.map
-                                    .getLonLatFromPixel(bottomRight);
-                            topLeft.transform(that.map.projection,
-                                    that.map.displayProjection);
-                            bottomRight.transform(that.map.projection,
-                                    that.map.displayProjection);
-
-                            // alert('top-left: ' + topLeft + ' bottom-right: '
-                            // + bottomRight);
-
-                            filter.add('mapLatitudeBounds', // filter id
-                            latProp, // property
-                            false, //
-                            'geo:lat', // 
-                            'between', // filter type
-                            '' + bottomRight.lat + '', // 1st value
-                            '' + topLeft.lat + '', // 2nd value
-                            'typed-literal', // 
-                            xsd + 'float', // datatype
-                            function() {
-                            }, // callback
-                            false, // 
-                            false, // negate
-                            true); // don't reload
-                            filter.add('mapLongitudeBounds', // filter id
-                            longProp, // property
-                            false, //
-                            'geo:long', // 
-                            'between', // filter type
-                            '' + topLeft.lon + '', // 1st value
-                            '' + bottomRight.lon + '', // 2nd value
-                            'typed-literal', // 
-                            xsd + 'float', // datatype
-                            function() {
-                            }, // callback
-                            false, // 
-                            false, // negate
-                            false); // don't reload
-                        }
-                    });
+                filter.add('mapLatitudeBounds', // filter id
+                    latProp, // property
+                    false, //
+                    'geo:lat', // 
+                    'between', // filter type
+                    '' + bottomRight.lat + '', // 1st value
+                    '' + topLeft.lat + '', // 2nd value
+                    'typed-literal', // 
+                    xsd + 'float', // datatype
+                    function() {}, // callback
+                    false, // 
+                    false, // negate
+                    true // don't reload
+                );
+                filter.add('mapLongitudeBounds', // filter id
+                    longProp, // property
+                    false, //
+                    'geo:long', // 
+                    'between', // filter type
+                    '' + topLeft.lon + '', // 1st value
+                    '' + bottomRight.lon + '', // 2nd value
+                    'typed-literal', // 
+                    xsd + 'float', // datatype
+                    function() {}, // callback
+                    false, // 
+                    false, // negate
+                    false // don't reload
+                );
+            }
+        }
+    );
 
     // add controls to the main map and the detail map
     this.map.addControl(new OpenLayers.Control.PanZoom());
@@ -169,17 +164,17 @@ function initMap() {
      * OpenLayers.Style({ fillColor: "#66ccff", strokeColor: "#3399ff",
      * graphicZIndex: 2 })
      */
-
     });
 
-    this.markers = new OpenLayers.Layer.Vector("New Markers", {
-        styleMap : myStyles,
-        rendererOptions : {
-            zIndexing : true
+    this.markers = new OpenLayers.Layer.Vector(
+        "New Markers",
+        {
+            styleMap : myStyles,
+            rendererOptions : {zIndexing : true}
         }
-    });
+    );
 
-    this.map.addLayers([ this.markers ]);
+    this.map.addLayers([this.markers]);
 
     //alert('disabledProviders: ' + this.disabledProviders);
 
@@ -489,7 +484,8 @@ function zoomTo(extent) {
  *            is not called in the right context of this object
  * @return nothing
  */
-function selectEvent(data, that) {
+function selectEvent(data, that)
+{
     if (!that) {
         that = this;
     }
@@ -558,7 +554,8 @@ function selectEvent(data, that) {
  *            is not called in the right context of this object
  * @return nothing
  */
-function onFeatureSelect(feature, that) {
+function onFeatureSelect(feature, that)
+{
     if (!that) {
         that = this;
     }
@@ -598,7 +595,6 @@ function onFeatureSelect(feature, that) {
     } else {
         // called by selectEvent, all done
     }
-
 }
 
 /**

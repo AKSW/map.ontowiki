@@ -1,8 +1,8 @@
 <?php
 // vim: sw=4:sts=4:expandtab
 
-if ( isset($this->message) ) {
-echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
+if (isset($this->message)) {
+    echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
 }
 ?>
 <div id="mapContainer" class="is-processing width99"></div>
@@ -11,7 +11,7 @@ echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
 //<![CDATA[
 
 // resize the mainMap according to the windowheight, if it is resized
-$('#mapContainer').height( $('#mapContainer').width() );
+$('#mapContainer').height($('#mapContainer').width());
 
 // this function should be in a lib
 function loadScript (scriptUrl) {

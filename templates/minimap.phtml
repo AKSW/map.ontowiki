@@ -8,14 +8,14 @@
 ?>
 
 <form id="minimapsearch">
-<p class="width98">
-    <label class="display-block" for="minimapsearch-input"><?php echo $this->_('Search for location') ?></label>
-    <input class="text width99 inner-label" type="text" id="minimapsearch-input" name="location" />
-</p>
+    <p class="width98">
+        <label class="display-block" for="minimapsearch-input"><?php echo $this->_('Search for location') ?></label>
+        <input class="text width99 inner-label" type="text" id="minimapsearch-input" name="location" />
+    </p>
 </form>
 
 <?php if ( isset($this->message) ): ?>
-	<p class="messagebox info"><?php echo $this->_($this->message); ?></p>
+<p class="messagebox info"><?php echo $this->_($this->message); ?></p>
 <?php endif; ?>
 <div id="miniMap" class="is-processing width99">
 </div>
@@ -24,16 +24,21 @@
 //    $('#miniMap').addClass('is-processing');
 //    $('#miniMap').addClass('width99');
 //    $('#miniMap').height( $('#miniMap').width() ); 
-        
-    <?php
-$htmlPartialUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'display'));
-$htmlPartialUrl->setParam('inline', true);
-if(isset($this->context) && $this->context == 'single_instance') {
-    $htmlPartialUrl->setParam('single_instance', 'on', true);
-}
-    ?>
-    $.get('<?php echo $htmlPartialUrl; ?>', function (data) {
+
+<?php
+    $htmlPartialUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'display'));
+    $htmlPartialUrl->setParam('inline', true);
+    if (isset($this->context) && $this->context == 'single_instance') {
+        $htmlPartialUrl->setParam('single_instance', 'on', true);
+    }
+?>
+
+$.get(
+    '<?php echo $htmlPartialUrl; ?>',
+    function (data)
+    {
         $('#miniMap').removeClass('is-processing');
         $('#miniMap').html(data);
-    });
+    }
+);
 </script>

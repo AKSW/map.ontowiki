@@ -1,38 +1,38 @@
 <?php
-// vim: sw=4:sts=4:expandtab
 
 if ( isset($this->message) ) {
     echo '<p class="messagebox info">' . $this->_($this->message) . '</p>';
 }
 ?>
 <!-- The main Map div, will be populated by OpenLayers in JavaScript -->
-<div
-	id="<?php echo $this->mapId; ?>" class="is-processing width99"></div>
+<div id="<?php echo $this->mapId; ?>" class="is-processing width99"></div>
 
 <script type="text/javascript">
 //<![CDATA[
 
-    // this function should be in a lib
-	function loadScript (scriptUrl) {
-	    var script  = document.createElement('script');
-	    script.type = 'text/javascript';
-	    script.src  = scriptUrl;
-	    $('head').append(script);
-	}
+// this function should be in a lib
+function loadScript (scriptUrl)
+{
+    var script  = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src  = scriptUrl;
+    $('head').append(script);
+}
 
-	// this function should be in a lib
-	function loadStyle (styleUrl, media) {
-	    if(!media) {
-	        var media = 'screen';
-	    }
-	    var link  = document.createElement('link');
-	    link.type = 'text/css';
-	    link.rel = 'stylesheet';
-	    link.media = media;
-	    link.href  = styleUrl;
-	    $('head').append(link);
-	}
-           
+// this function should be in a lib
+function loadStyle (styleUrl, media)
+{
+    if (!media) {
+        var media = 'screen';
+    }
+    var link  = document.createElement('link');
+    link.type = 'text/css';
+    link.rel = 'stylesheet';
+    link.media = media;
+    link.href  = styleUrl;
+    $('head').append(link);
+}
+
 // TODO resize map to page height if it is the mainmap
 loadStyle('<?php echo $this->componentUrlBase . 'css/OpenLayers.css'; ?>', 'screen');
 
@@ -55,9 +55,9 @@ loadScript('<?php echo $this->componentUrlBase . 'classes/MapManager.js'; ?>');
 
 // TODO: have to implement a better check here and maybe get a better size
 if ($('#<?php echo $this->mapId; ?>').width() > 100) {
-	$('#<?php echo $this->mapId; ?>').height( $('#<?php echo $this->mapId; ?>').width() );
+    $('#<?php echo $this->mapId; ?>').height( $('#<?php echo $this->mapId; ?>').width() );
 } else {
-	$('#<?php echo $this->mapId; ?>').height( '550px' );
+    $('#<?php echo $this->mapId; ?>').height( '550px' );
 }
 
 var <?php echo $this->mapVar; ?>;
@@ -132,9 +132,13 @@ function goForMap () {
         new OpenLayers.Pixel(<?php echo $this->config->cluster->offset; ?>)
     );
 
-    $('body').bind('ontowiki.selection.changed', function(event, data) {
-    	<?php echo $this->mapVar; ?>.selectEvent(data, minimap);
-    });
+    $('body').bind(
+        'ontowiki.selection.changed',
+        function(event, data)
+        {
+            <?php echo $this->mapVar; ?>.selectEvent(data, minimap);
+        }
+    );
     
     <?php echo $this->mapVar; ?>.prepare();
     <?php echo $this->mapVar; ?>.init();

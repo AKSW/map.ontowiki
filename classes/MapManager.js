@@ -577,7 +577,6 @@ function onFeatureSelect(feature, that)
      * unselecte, like half-selected.
      */
 
-    // alert('select feature: ' + feature.id);
     if (typeof OntoWiki.selectedResources == "undefined") {
         OntoWiki.selectedResources = [];
     }

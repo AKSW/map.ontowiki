@@ -78,7 +78,12 @@ class MapHelper extends OntoWiki_Component_Helper
 
     public function shouldShow ()
     {
-        $logger = OntoWiki::getInstance()->logger;
+        /**
+         * for debug output
+         * @var OntoWiki Instance of the App-Object
+         */
+        $owApp = OntoWiki::getInstance();
+        $logger = $owApp->logger;
         $logger->debug('shouldShow Helper');
         if ($this->_listHelper == null) {
             $this->_listHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('List');
@@ -87,11 +92,6 @@ class MapHelper extends OntoWiki_Component_Helper
         /*
          * don't show on model, application, error, debug, module and index controller
          */
-        /**
-         * for debug output
-         * @var OntoWiki Instance of the App-Object
-         */
-        $owApp = OntoWiki::getInstance();
         /*
            $session = $owApp->session;
          */
@@ -224,7 +224,11 @@ class MapHelper extends OntoWiki_Component_Helper
                         $result = false;
                     }
                 } catch (Erfurt_Store_Adapter_Exception $e) {
-                    $owApp->logger->err('Caught exception on query, but I am just a Helper, but I will show anyways: ',  $e->getMessage(), "\n");
+                    $owApp->logger->err(
+                        'Caught exception on query, but I am just a Helper, but I will show anyways: ',
+                        $e->getMessage(),
+                        "\n"
+                    );
                     $result = true;
                 }
 

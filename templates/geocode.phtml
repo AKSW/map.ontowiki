@@ -57,7 +57,7 @@
 
     var htmlPartialUrl = '<?php echo $htmlPartialUrl; ?>';
     var jsonRequestUrl = htmlPartialUrl.replace(/__searchstring__/, encodeURI(searchstring));
-    
+
     $.getJSON(jsonRequestUrl, function (data) {
         //$('#geocode-debug').html(data);
         $('#geocode-resultlist').empty();
@@ -68,62 +68,60 @@
         htmlout += "<table class='separated-vertical'>";
         var extent = {};
 
-        // TODO use jQuery each
-        for each (var geocoder in data) {
-            if (typeof geocoder[0] != 'undefined') {
+        $.each (data, function (index, geocoder)
+            {
+                if (typeof geocoder[0] != 'undefined') {
+                    var marker_id = "<?php echo $this->data['resourceUri']; ?>/" + geocoder.label;
 
-                var marker_id = "<?php echo $this->data['resourceUri']; ?>/" + geocoder.label;
-
-                if (typeof minimap != 'undefined') {
-                    minimap.addResource(geocoder[0].lat, geocoder[0].lon, marker_id);
-                } else {
-                    //TODO: Bring up map if minimap module is not shown
-                }
-
-                htmlout += "<tr class='geocode-results' id='" + geocoder.label + "' resid='" + marker_id + "'>";
-                htmlout += "<td>" + geocoder.label;
-                htmlout += "</td>";
-
-                htmlout += "<td style='width: 80px;'><div class='star-accuracy-inactive' style='width: " + 8*(10 - geocoder[0].accuracy) + "px; background-position: " + 8*(10 - geocoder[0].accuracy) + "px 0px' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
-                htmlout += "<div class='star-accuracy' style='width: " + 8*(geocoder[0].accuracy) + "px;' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
-
-                htmlout += "</td><td>";
-                htmlout += "<span property='http://www.w3.org/2003/01/geo/wgs84_pos#lat_long' content='" + geocoder[0].lat + "," + geocoder[0].lon + "' accuracy='" + geocoder[0].accuracy + "'></span>";
-                //htmlout += "<a class='button geocode-usebutton' coordinates='" + geocoder[0].lat + "," + geocoder[0].lon + "'><?php echo $this->_('Use this') ?></a></td></tr>";
-                htmlout += "<a class='button geocode-usebutton' coordinates='" + geocoder[0].lat + "," + geocoder[0].lon + "' title='<?php echo $this->_('Use this') ?>'><img src='<?php echo $this->themeUrlBase; ?>images/icon-save.png' /></a></td></tr>";
-                
-
-                // Show more results if the geocode did return more
-                if (typeof geocoder[1] != 'undefined') {
-                    htmlout += "<tr><td colspan='3' style='border-top: none;'>";
-                    htmlout += "<a class='geocode-more'><span class='icon-button expand'></span> <?php echo $this->_('More results') ?></a>";
-                    htmlout += "<table class='seperated-vertical geocode-moreresults' style='display:none;'>";
-
-                    moreresults = 1;
-                
-                    while (typeof geocoder[moreresults] != 'undefined') {
-                        htmlout += "<tr><td>" + geocoder[moreresults].name + "<br />";
-                        htmlout += "<span property='http://www.w3.org/2003/01/geo/wgs84_pos#lat_long' content='" + geocoder[moreresults].lat + "," + geocoder[moreresults].lon + "' accuracy='" + geocoder[moreresults].accuracy + "'></span>";
-                        htmlout += "<a class='button geocode-usebutton' title='<?php echo $this->_('Use this') ?>'><img src='<?php echo $this->themeUrlBase; ?>images/icon-save.png' /></a>";
-                        htmlout += "<div class='star-accuracy-inactive' style='width: " + 8*(10 - geocoder[0].accuracy) + "px; background-position: " + 8*(10 - geocoder[moreresults].accuracy) + "px 0px' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
-                        htmlout += "<div class='star-accuracy' style='width: " + 8*(geocoder[moreresults].accuracy) + "px;' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
-                        htmlout += "</td>";
-                        moreresults++;
+                    if (typeof minimap != 'undefined') {
+                        minimap.addResource(geocoder[0].lat, geocoder[0].lon, marker_id);
+                    } else {
+                        //TODO: Bring up map if minimap module is not shown
                     }
-                    htmlout += "</table></td></tr>";
-                }
 
-                results = true;
-            }
-            else { 
-                if (results != true) {
-                    results = false;
+                    htmlout += "<tr class='geocode-results' id='" + geocoder.label + "' resid='" + marker_id + "'>";
+                    htmlout += "<td>" + geocoder.label;
+                    htmlout += "</td>";
+
+                    htmlout += "<td style='width: 80px;'><div class='star-accuracy-inactive' style='width: " + 8*(10 - geocoder[0].accuracy) + "px; background-position: " + 8*(10 - geocoder[0].accuracy) + "px 0px' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
+                    htmlout += "<div class='star-accuracy' style='width: " + 8*(geocoder[0].accuracy) + "px;' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
+
+                    htmlout += "</td><td>";
+                    htmlout += "<span property='http://www.w3.org/2003/01/geo/wgs84_pos#lat_long' content='" + geocoder[0].lat + "," + geocoder[0].lon + "' accuracy='" + geocoder[0].accuracy + "'></span>";
+                    //htmlout += "<a class='button geocode-usebutton' coordinates='" + geocoder[0].lat + "," + geocoder[0].lon + "'><?php echo $this->_('Use this') ?></a></td></tr>";
+                    htmlout += "<a class='button geocode-usebutton' coordinates='" + geocoder[0].lat + "," + geocoder[0].lon + "' title='<?php echo $this->_('Use this') ?>'><img src='<?php echo $this->themeUrlBase; ?>images/icon-save.png' /></a></td></tr>";
+
+                    // Show more results if the geocode did return more
+                    if (typeof geocoder[1] != 'undefined') {
+                        htmlout += "<tr><td colspan='3' style='border-top: none;'>";
+                        htmlout += "<a class='geocode-more'><span class='icon-button expand'></span> <?php echo $this->_('More results') ?></a>";
+                        htmlout += "<table class='seperated-vertical geocode-moreresults' style='display:none;'>";
+
+                        moreresults = 1;
+
+                        while (typeof geocoder[moreresults] != 'undefined') {
+                            htmlout += "<tr><td>" + geocoder[moreresults].name + "<br />";
+                            htmlout += "<span property='http://www.w3.org/2003/01/geo/wgs84_pos#lat_long' content='" + geocoder[moreresults].lat + "," + geocoder[moreresults].lon + "' accuracy='" + geocoder[moreresults].accuracy + "'></span>";
+                            htmlout += "<a class='button geocode-usebutton' title='<?php echo $this->_('Use this') ?>'><img src='<?php echo $this->themeUrlBase; ?>images/icon-save.png' /></a>";
+                            htmlout += "<div class='star-accuracy-inactive' style='width: " + 8*(10 - geocoder[0].accuracy) + "px; background-position: " + 8*(10 - geocoder[moreresults].accuracy) + "px 0px' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
+                            htmlout += "<div class='star-accuracy' style='width: " + 8*(geocoder[moreresults].accuracy) + "px;' title='<?php echo $this->_('Accuracy (higher is better)') ?>'></div>";
+                            htmlout += "</td>";
+                            moreresults++;
+                        }
+                        htmlout += "</table></td></tr>";
+                    }
+                    results = true;
+                }
+                else {
+                    if (results != true) {
+                        results = false;
+                    }
                 }
             }
-        }
+        );
 
         if (typeof minimap != 'undefined') {
-            minimap.zoomIdeal(); // Zoom minimap so that all markers are shown    
+            minimap.zoomIdeal(); // Zoom minimap so that all markers are shown
         }
         
         htmlout += "</table>";

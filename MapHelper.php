@@ -211,16 +211,21 @@ class MapHelper extends OntoWiki_Component_Helper
                 );
 
                 /* get result of the query */
-                $dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
-                $indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
+                try {
+                    $dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
+                    $indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
 
-                $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
-                $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
+                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
+                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
 
-                if ($dirResult OR $indResult) {
+                    if ($dirResult OR $indResult) {
+                        $result = true;
+                    } else {
+                        $result = false;
+                    }
+                } catch (Erfurt_Store_Adapter_Exception $e) {
+                    $owApp->logger->err('Caught exception on query, but I am just a Helper, but I will show anyways: ',  $e->getMessage(), "\n");
                     $result = true;
-                } else {
-                    $result = false;
                 }
 
                 return $result;

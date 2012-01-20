@@ -41,25 +41,9 @@ class MapModule extends OntoWiki_Module
 
     public function getContents()
     {
-        $logger = OntoWiki::getInstance()->logger;
-        $logger->debug('getContents');
-        //        if (isset($this->_owApp->session->instances)) {
-        $this->_owApp->logger->debug('MimimapModule/getContents: lastRoute = "' . $this->_owApp->lastRoute . '".');
-        if ($this->_owApp->lastRoute == 'properties') {
-            $this->view->context = 'single_instance';
-        } else if ($this->_owApp->lastRoute == 'instances') {
-
-        } else {
-
-        }
-
-        if ($this->_owApp->selectedResource) {
-            $this->_owApp->logger->debug(
-                'MimimapModule/getContents: selectedResource = "' . $this->_owApp->selectedResource . '".'
-            );
-        }
+        $this->_owApp->logger->debug('getContents');
         // TODO should show geocode options only on single resource view
-        return $this->getGeostatsContents() . $this->getGeocodeContents() . $this->render('minimap');
+        return $this->getGeocodeContents() . $this->getMapContents() . $this->getGeostatsContents();
     }
 
     // TODO: merge with geocode shouldShow code
@@ -136,6 +120,29 @@ class MapModule extends OntoWiki_Module
             . $this->_owApp->selectedResource;
 
         return $id;
+    }
+
+    /**
+     * Get the map content
+     */
+    public function getMapContents()
+    {
+        //        if (isset($this->_owApp->session->instances)) {
+        $this->_owApp->logger->debug('MimimapModule/getContents: lastRoute = "' . $this->_owApp->lastRoute . '".');
+        if ($this->_owApp->lastRoute == 'properties') {
+            $this->view->context = 'single_instance';
+        } else if ($this->_owApp->lastRoute == 'instances') {
+
+        } else {
+
+        }
+
+        if ($this->_owApp->selectedResource) {
+            $this->_owApp->logger->debug(
+                'MimimapModule/getContents: selectedResource = "' . $this->_owApp->selectedResource . '".'
+            );
+        }
+        return $this->render('minimap');
     }
 
     /**

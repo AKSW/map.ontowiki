@@ -47,6 +47,7 @@ function MapManager(mapContainer, extent, jsonUrl)
     this.addResourceManualQuit = addResourceManualQuit;
     this.disableMode = disableMode;
     this.enableMode = enableMode;
+    this.selectLayer = selectLayer;
     // this.onLayerChange = onLayerChange;
 }
 
@@ -331,6 +332,10 @@ function initMap()
 
     // Finally fire an event that tells the map has finished loading
     $('#mapContainer').trigger('initend');
+}
+
+function selectLayer(name) {
+    this.map.setBaseLayer(this.map.getLayersByName(name)[0]);
 }
 
 // load resources to display from MapController and build and display markers on

@@ -103,12 +103,12 @@ class MapModule extends OntoWiki_Module
 
         // layer sub menu
         $layerMenu = new OntoWiki_Menu();
-        $layerMenu->setEntry('Google Streets', "javascript:minimapSelectLayer('Google Streets')")
-            ->setEntry('Google Hybrid', "javascript:minimapSelectLayer('Google Hybrid')")
-            ->setEntry('Google Satellite', "javascript:minimapSelectLayer('Google Hybrid')")
-            ->setEntry('Google Physical', "javascript:minimapSelectLayer('Google Hybrid')")
-            ->setEntry('OpenStreetMaps', "javascript:minimapSelectLayer('OpenStreetMap')")
-            ->setEntry('OpenStreetMaps (Tiles@Home)', "javascript:minimapSelectLayer('OpenStreetMap (Tiles@Home)')");
+        $layerMenu->setEntry('Google Streets', "javascript:minimap.selectLayer('Google Streets')")
+            ->setEntry('Google Hybrid', "javascript:minimap.selectLayer('Google Hybrid')")
+            ->setEntry('Google Satellite', "javascript:minimap.selectLayer('Google Hybrid')")
+            ->setEntry('Google Physical', "javascript:minimap.selectLayer('Google Hybrid')")
+            ->setEntry('OpenStreetMaps', "javascript:minimap.selectLayer('OpenStreetMap')")
+            ->setEntry('OpenStreetMaps (Tiles@Home)', "javascript:minimap.selectLayer('OpenStreetMap (Tiles@Home)')");
 
         // zoom sub menu
         $zoomMenu = new OntoWiki_Menu();

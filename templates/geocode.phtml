@@ -7,36 +7,22 @@
  */
 
 ?>
+<?php if ( isset($this->message) ): ?>
+<!-- war mal div -->
+<p class="messagebox info" id="geocode-warning"><?php echo $this->_($this->message); ?></p>
+<?php endif; ?>
+
+<form id="minimapsearch">
+    <p class="width98">
+        <label class="display-block" for="minimapsearch-input"><?php echo $this->_('Search for location') ?></label>
+        <input class="text width99 inner-label" type="text" id="minimapsearch-input" name="location" />
+        <!-- maybe we should show a button for some touch devices -->
+        <!-- <a class="button" id="geocode-button"><span><?php echo $this->_('Go') ?></span></a> -->
+    </p>
+</form>
+
 <div id="geocode-resultlist" style="display: none;"></div>
 <div id="geocode-form">
-<?php 
-    if ($this->data['accuracy'] === null) {
-        $warning = $this->_('This ressource has no accuracy property. New geocoding is recommended.');
-    } else if ($this->data['accuracy'] < $this->data['accuracyLimit'] ) {
-        $warning = $this->_('This ressource has low accuracy. New geocoding is recommended.');
-    } else {
-        $warning = null;
-    }
-?>
-
-<?php
-    if ($warning != null) {
-?>
-<div class="warning" id="geocode-warning">
-    <?php echo $warning; ?>
-</div>
-<?php
-    }
-?>
-<?php echo $this->_('Geocode will be performed using this address') ?>:<br />
-<input id="geocode-searchString" name="searchString" type="text"
-    style="
-    background-image: url("<?php echo $this->themeUrlBase; ?>images/icon-edit-grey.png");"
-    value="<?php echo $this->data['searchString'] ?>" size="30"
-    class="geocode-addressbar text width99 inner-label" /><br />
-<a class="button" id="geocode-button"><img
-    src="<?php echo $this->themeUrlBase; ?>images/zoom-world-mini.png"><span>&nbsp;<?php echo $this->_('Geocode this ressource') ?></span></a>
-</div>
 
 <script type="text/javascript">
 
@@ -50,8 +36,8 @@
     */
     function doGeocode () {
 
-    var searchstring = $('#geocode-searchString').val();
-    $('#geocode-form').hide();  
+    var searchstring = $('#minimapsearch-input').val();
+    //$('#geocode-form').hide();
     $('#geocode-resultlist').html('<?php echo $this->_('Geocoding for') ?> "<span id="geocode-searchoutput">' + searchstring + '</span>" <img src="<?php echo $this->themeUrlBase; ?>images/spinner.gif"><br />');
     $('#geocode-resultlist').show();
 
@@ -153,7 +139,7 @@
         });
 
         // Listen for manual resource placement (event triggered by mapmanager in map component)
-        $('body').bind('ontowiki.resource.placed', function(event, data) {             
+        $('body').bind('ontowiki.resource.placed', function(event, data) {
             $('#geocode-manual-output').attr("content", data.lat+','+data.lon);
             $('#geocode-manual-output').html('<?php echo $this->_('Set') ?>');
             $('#geocode-manual-output').css("color","green");
@@ -163,7 +149,7 @@
             $('#geocode-resultlist').empty();
             htmlout =
             $('#geocode-resultlist').append('<?php echo $this->_('Unfortunately no geocoding results were returned. Please try a different name.') ?><br />');
-            $('#geocode-form').show();
+            //$('#geocode-form').show();
         }
         
     });
@@ -211,3 +197,4 @@
     });
     }
 </script>
+</div>

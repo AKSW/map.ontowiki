@@ -18,7 +18,7 @@ $(document).ready(function()
         doGeocode();
     });
 
-    $("#geocode-searchString").keypress(function (e)
+    $("#minimapsearch-input").keypress(function (e)
     {
         if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
             doGeocode();

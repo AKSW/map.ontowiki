@@ -39,13 +39,6 @@ class MapModule extends OntoWiki_Module
         return $this->_owApp->translate->_('Map');
     }
 
-    public function getContents()
-    {
-        $this->_owApp->logger->debug('getContents');
-        // TODO should show geocode options only on single resource view
-        return $this->getGeocodeContents() . $this->getMapContents() . $this->getGeostatsContents();
-    }
-
     // TODO: merge with geocode shouldShow code
     public function shouldShow()
     {
@@ -122,12 +115,20 @@ class MapModule extends OntoWiki_Module
         return $id;
     }
 
+    public function getContents()
+    {
+        $this->_owApp->logger->debug('getContents');
+
+        // TODO should show geocode options only on single resource view
+        return $this->getGeocodeContents() . $this->getMapContents() . $this->getGeostatsContents();
+    }
+
     /**
      * Get the map content
      */
     public function getMapContents()
     {
-        //        if (isset($this->_owApp->session->instances)) {
+        // if (isset($this->_owApp->session->instances)) {
         $this->_owApp->logger->debug('MimimapModule/getContents: lastRoute = "' . $this->_owApp->lastRoute . '".');
         if ($this->_owApp->lastRoute == 'properties') {
             $this->view->context = 'single_instance';
@@ -305,7 +306,17 @@ class MapModule extends OntoWiki_Module
         $data['action']         = $this->_request->getActionName();
         $data['accuracyLimit']  = $this->_privateConfig->geocodeAccuracyLimit;
 
-        $content = $this->render('templates/geocode', $data, 'data');
+    if ($data['accuracy'] === null) {
+        $this->view->message = $this->_owApp->translate->_(
+            'This ressource has no accuracy property. New geocoding is recommended.'
+        );
+    } else if ($this->data['accuracy'] < $this->data['accuracyLimit'] ) {
+        $this->view->mmessage = $this->_owApp->translate->_(
+            'This ressource has low accuracy. New geocoding is recommended.'
+        );
+    }
+
+        $content = $this->render('geocode', $data, 'data');
 
         return $content;
     }

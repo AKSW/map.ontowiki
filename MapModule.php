@@ -177,46 +177,56 @@ class MapModule extends OntoWiki_Module
 
         $poiType = $this->_privateConfig->type->poi->toArray();
 
+        $this->model = $this->_owApp->selectedModel;
+
+        /*
+         * TODO: in the following the 5th parameter for countWhereMatches is set to false, because there seams to be a
+         *       problem in 'libraries/Erfurt/Erfurt/Store.php' with followImports. This has to be fixed.
+         */
         $stats['typedResources'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->_owApp->selectedResource->getIri(),
+            $this->model,
             "WHERE { ?uri <" . $typeProp[0] . "> <" . $poiType . "> . }",
             "?uri",
-            true
+            true,
+            false
         );
 
         // Count ressources with geographical coordinates
         $stats['with_coords'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->_owApp->selectedResource->getIri(),
+            $this->model,
             "WHERE { "
             . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
             . " ?uri <" . $longitudeProp[0] . "> ?long . "
             . "}",
             "?uri",
-            true
+            true,
+            false
         );
 
         $stats['without_coords'] = $stats['typedResources'] - $stats['with_coords'];
 
         // Count ressources with accuracy beween 0 and 5
         $stats['low_accuracy'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->_owApp->selectedResource->getIri(),
+            $this->model,
             "WHERE { "
             . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
             . " ?uri <" . $accuracyProp[0] . "> ?accuracy FILTER (?accuracy < 6 && ?accuracy > -1) "
             . "}",
             "?uri",
-            true
+            true,
+            false
         );
 
         // Count ressources geocoded via postcodeNL geocoder
         $stats['postcode_geocoded'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->_owApp->selectedResource->getIri(),
+            $this->model,
             "WHERE { "
             . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
             . " ?uri <" . $accuracyProp[0] . "> ?accuracy FILTER (?accuracy < 0) "
             . "}",
             "?uri",
-            true
+            true,
+            false
         );
 
         $content = $this->render('geostats', $stats, 'stats');

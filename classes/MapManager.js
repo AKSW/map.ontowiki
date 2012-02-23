@@ -1,4 +1,4 @@
-function MapManager (mapContainer, extent, jsonUrl)
+function MapManager(mapContainer, extent, jsonUrl)
 {
     /* properties */
     this.mapContainer = mapContainer;

@@ -59,25 +59,11 @@ class MapHelper extends OntoWiki_Component_Helper
                 );
             }
         }
-
-        /**
-         * From Geocoder
-         */
-
-        // if a model has been selected
-        if ($owApp->selectedModel != null) {
-            // register with extras menu
-            $this->translate  = $owApp->translate;
-            $appMenu        = OntoWiki_Menu_Registry::getInstance()->getMenu('application');
-            $extrasMenu     = $appMenu->getSubMenu('Extras');
-            $geoCoderLabel  = $this->translate->_('Geo Coder', $owApp->config->languages->locale);
-            $geoCoderUrl    = $owApp->urlBase . 'geocoder/init'; // TODO fix this url
-            $extrasMenu->setEntry($geoCoderLabel, $geoCoderUrl);
-        }
     }
 
     public function shouldShow ()
     {
+        return true;
         /**
          * for debug output
          * @var OntoWiki Instance of the App-Object

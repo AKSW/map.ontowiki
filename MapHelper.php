@@ -89,7 +89,7 @@ class MapHelper extends OntoWiki_Component_Helper
         $latProperty    = $latProperties[0];
         $longProperty   = $longProperties[0];
 
-        if ($this->_owApp->lastRoute == 'properties' && $this->_owApp->SelectedResource != null) {
+        if ($this->_owApp->lastRoute == 'properties' && $this->_owApp->selectedResource != null) {
             //$this->_owApp->selectedResource;
 
             $dirQuery = '

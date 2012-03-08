@@ -27,7 +27,8 @@ class Marker
      * status properties indeicating, if a marker is on the Map (visibility) and if a marker is clustered and
      * represented by a cluster on the map
      */
-    private $_onMap, $_inCluster;
+    private $_onMap;
+    private $_inCluster;
 
     //public $isCluster;
 

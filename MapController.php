@@ -255,10 +255,10 @@ class MapController extends OntoWiki_Controller_Component
                 $bnd[$key] = new Erfurt_Sparql_Query2_RDFLiteral($_bnd, $datatype);
             }
 
-            $bnd['top'] = new Erfurt_Sparql_Query2_Smaller('?lat', $bnd['top']);
+            $bnd['top'] = new Erfurt_Sparql_Query2_Smaller('?lat',  $bnd['top']);
             $bnd['rgt'] = new Erfurt_Sparql_Query2_Smaller('?long', $bnd['rgt']);
-            $bnd['btm'] = new Erfurt_Sparql_Query2_Larger('?lat', $bnd['btm']);
-            $bnd['lft'] = new Erfurt_Sparql_Query2_Larger('?long', $bnd['lft']);
+            $bnd['btm'] = new Erfurt_Sparql_Query2_Larger('?lat',   $bnd['btm']);
+            $bnd['lft'] = new Erfurt_Sparql_Query2_Larger('?long',  $bnd['lft']);
             $dttyps[]   = new Erfurt_Sparql_Query2_ConditionalAndExpression($bnd);
         }
         $filter = new Erfurt_Sparql_Query2_Filter(new Erfurt_Sparql_Query2_ConditionalOrExpression($dttyps));

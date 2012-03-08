@@ -63,7 +63,6 @@ class MapHelper extends OntoWiki_Component_Helper
 
     public function shouldShow ()
     {
-        return true;
         /**
          * for debug output
          * @var OntoWiki Instance of the App-Object

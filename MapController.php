@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Map, Geocode, Geoservices and Geocoding component controller.
+ * Map component controller.
  *
  * @category OntoWiki
  * @package OntoWiki_extensions_components_map
@@ -118,7 +118,6 @@ class MapController extends OntoWiki_Controller_Component
     {
         require_once $this->_componentRoot . 'classes/Marker.php';
         require_once $this->_componentRoot . 'classes/Clusterer.php';
-        //        require_once $this->_componentRoot . 'classes/GeoCoder.php';
 
         // tells the OntoWiki to not apply the template to this action
         $this->_helper->viewRenderer->setNoRender();

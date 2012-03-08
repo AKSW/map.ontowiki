@@ -23,12 +23,6 @@ class MapModule extends OntoWiki_Module
               $this->_name . DIRECTORY_SEPARATOR . 'languages/', null,
               array('scan' => Zend_Translate::LOCALE_FILENAME));
          */
-
-        /**
-         * From geocode module
-         */
-        $this->view->headScript()->appendFile($this->view->moduleUrl . 'classes/geocode.js');
-        $this->view->headLink()->appendStylesheet($this->view->moduleUrl . 'css/geocode.css', 'screen');
     }
 
     public function getTitle()
@@ -38,7 +32,6 @@ class MapModule extends OntoWiki_Module
         return $this->_owApp->translate->_('Map');
     }
 
-    // TODO: merge with geocode shouldShow code
     public function shouldShow()
     {
         $logger = OntoWiki::getInstance()->logger;

@@ -184,7 +184,7 @@ class MapModule extends OntoWiki_Module
          *       problem in 'libraries/Erfurt/Erfurt/Store.php' with followImports. This has to be fixed.
          */
         $stats['typedResources'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->model,
+            (string) $this->model,
             "WHERE { ?uri <" . $typeProp[0] . "> <" . $poiType . "> . }",
             "?uri",
             true,
@@ -193,7 +193,7 @@ class MapModule extends OntoWiki_Module
 
         // Count ressources with geographical coordinates
         $stats['with_coords'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->model,
+            (string) $this->model,
             "WHERE { "
             . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
             . " ?uri <" . $longitudeProp[0] . "> ?long . "
@@ -207,7 +207,7 @@ class MapModule extends OntoWiki_Module
 
         // Count ressources with accuracy beween 0 and 5
         $stats['low_accuracy'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->model,
+            (string) $this->model,
             "WHERE { "
             . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
             . " ?uri <" . $accuracyProp[0] . "> ?accuracy FILTER (?accuracy < 6 && ?accuracy > -1) "
@@ -219,7 +219,7 @@ class MapModule extends OntoWiki_Module
 
         // Count ressources geocoded via postcodeNL geocoder
         $stats['postcode_geocoded'] = $this->_owApp->erfurt->getStore()->countWhereMatches(
-            $this->model,
+            (string) $this->model,
             "WHERE { "
             . " ?uri <" . $typeProp[0] . "> <" . $poiType . "> . "
             . " ?uri <" . $accuracyProp[0] . "> ?accuracy FILTER (?accuracy < 0) "

@@ -39,7 +39,9 @@ loadStyle('<?php echo $this->componentUrlBase . 'css/OpenLayers.css'; ?>', 'scre
 <?php
 // TODO put these uris into configuration
 if (!isset($this->config->load->google) || !$this->config->load->google == false) {
-    echo 'loadScript(\'http://maps.google.com/maps?file=api&v=2&hl=de&key=' . $this->config->apikey->google . '&async=2\')' . ";\n";
+    echo 'loadScript('
+         . '\'http://maps.google.com/maps?file=api&v=2&hl=de&key=' . $this->config->apikey->google . '&async=2\''
+         . ')' . ";\n";
 }
 if (!isset($this->config->load->yahoo) || !$this->config->load->yahoo == false) {
     echo 'loadScript(\'http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=' . $this->config->apikey->yahoo . '\')' . ";\n";
@@ -139,7 +141,7 @@ function goForMap () {
             <?php echo $this->mapVar; ?>.selectEvent(data, minimap);
         }
     );
-    
+
     <?php echo $this->mapVar; ?>.prepare();
     <?php echo $this->mapVar; ?>.init();
 }

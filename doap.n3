@@ -10,7 +10,7 @@
 <> foaf:primaryTopic :map .
 :map a doap:Project ;
   doap:name "map" ;
-  rdfs:label "OntoWiki Map Extension"
+  rdfs:label "OntoWiki Map Extension" ;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
   owconfig:latestZip <https://github.com/AKSW/map.ontowiki/zipball/v1.0>.

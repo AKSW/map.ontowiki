@@ -7,7 +7,7 @@
 @prefix : <https://raw.github.com/AKSW/map.ontowiki/master/doap.n3#> .
 
 <> foaf:primaryTopic :map .
-:map a extension:Project ;
+:map a doap:Project ;
   doap:name "map" ;
   rdfs:label "Map Extension" ;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;

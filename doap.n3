@@ -2,15 +2,113 @@
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owconfig: <http://ns.ontowiki.net/SysOnt/ExtensionConfig/> .
-@prefix extension: <http://ns.ontowiki.net/Extensions/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix event: <http://ns.ontowiki.net/SysOnt/Events/> .
 @prefix : <https://raw.github.com/AKSW/map.ontowiki/master/doap.n3#> .
 
 <> foaf:primaryTopic :map .
+
 :map a doap:Project ;
   doap:name "map" ;
-  rdfs:label "OntoWiki Map Extension"
+  rdfs:label "Map Extension" ;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
+  owconfig:authorLabel "Natanael Arndt" ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
-  owconfig:latestZip <https://github.com/AKSW/map.ontowiki/zipball/v1.0>.
+  :license "http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)" ;
+  doap:release :v1 ;
+
+  :confAction "map/config" ;
+  owconfig:privateNamespace <https://github.com/AKSW/map/raw/master/doap.n3#> ;
+  owconfig:pluginEvent event:onDisplayLiteralPropertyValue ;
+  owconfig:enabled "true"^^xsd:boolean ;
+  owconfig:templates "templates/" ;
+  owconfig:languages "languages/" ;
+  owconfig:hasModule :Map .
+
+:Map a owconfig:Module ;
+  rdfs:label "Map" ;
+  owconfig:priority "10" ;
+  owconfig:context "main.window.properties" ;
+  owconfig:context "main.window.instances" .
+
+:this owconfig:config [
+      a owconfig:Config;
+      owconfig:id "show";
+      :_tab "auto" ;
+      :_tab "never" ;
+      :_tab "ever" ;
+      :tab "auto"
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "load";
+      :osm "1" ;
+      :google "" ;
+      :localMap "" ;
+      :yahoo ""
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "localMap";
+      :titel "Local Map" ;
+      :url "http://localhost/tiles/${z}/${x}/${y}.png"
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "default";
+      :_layer "Google Streets" ;
+      :_layer "Google Hybrid" ;
+      :_layer "Google Satellite" ;
+      :_layer "Google Physical" ;
+      :_layer "OpenStreetMap" ;
+      :_layer "Local Map" ;
+      :layer "OpenStreetMap" ;
+      :latitude "51.33687" ;
+      :longitude "12.38538"
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "property";
+      :_latitude <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ;
+      :_latitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Latitude> ;
+      :latitude <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ;
+      :_longitude <http://www.w3.org/2003/01/geo/wgs84_pos#long> ;
+      :_longitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Longitude> ;
+      :longitude <http://www.w3.org/2003/01/geo/wgs84_pos#long>
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "apikey";
+      :google "ABQIAAAAynyr50kleiy5o-uQwf2tTBRnE7oD7ulPnCTyuIl4SzAcqF9XxBSKle9ZP7LcJUMzGgym1wQT_TV0Uw" ;
+      :yahoo "P7p9l9zV34H4XCVwfyOYUjckKPEttCqyczem_IO2xqjKkTk3G_TPf1fQtxlSk57Q8B0e8Sw-"
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "icon";
+      :path "../../themes/silverblue/images/marker.png" ;
+      :size "10,10" ;
+      :offset "-5,-5"
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "cluster";
+      :path "../../themes/silverblue/images/cluster-marker.png" ;
+      :size "20,20" ;
+      :offset "-10,-10"
+];
+ owconfig:config [
+      a owconfig:Config;
+      owconfig:id "clusterer";
+      :gridCount "10" ;
+      :maxMarkers "4"
+];
+ :dontShowController "model" ;
+  :dontShowController "application" ;
+  :dontShowController "error" ;
+  :dontShowController "debug" ;
+  :dontShowController "module" ;
+  :dontShowController "index" .
+
+:v1 a doap:Version ;
+  doap:revision "1.0" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.0> .

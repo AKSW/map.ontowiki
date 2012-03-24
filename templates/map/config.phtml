@@ -17,6 +17,11 @@ if ( isset($this->message) ) {
     {
         var name = $(button).parent().attr("id");
         var enabled = $(button).attr("selected");
+        if (enabled == "true") {
+            $(button).attr("value", "1");
+        } else {
+            $(button).attr("value", "");
+        }
         /*$.post(urlBase + "exconf/conf/?name="+name+"&enabled="+enabled,function(data){if(data==""){$("#numEnabled").html(parseInt($("#numEnabled").html())+( enabled == "true" ? 1 : -1));$("#numDisabled").html(parseInt($("#numDisabled").html())+( enabled == "true" ? -1 : 1));}});*/
     }
 
@@ -29,6 +34,9 @@ $(function()
             postToggle
         }
     );
+
+    $('#ol_version').text(OpenLayers.VERSION_NUMBER);
+
 });
 
 //]]>
@@ -135,7 +143,7 @@ $(function()
                 <?php foreach ($this->config->load as $provider => $enabled): ?>
                 <tr>
                     <td><?php echo $this->escape($provider) ?></td>
-                    <td><div class="togglebutton" <?php if(isset($enabled) && $enabled){ echo "selected=\"true\""; } ?>></div></td>
+                    <td><div class="togglebutton" name="load.<?php echo $this->escape($provider) ?>" value="<?php echo $enabled ?>" <?php if ($enabled) { echo "selected=\"true\""; } ?>></div></td>
                     <!--<td><div class="togglebutton" selected="true" ></div></td>-->
                     <td>
                         <?php $key = $this->config->apikey->$provider; ?>
@@ -175,12 +183,6 @@ $(function()
     <textarea name="config"><?php echo $confStr; ?></textarea> <br/>
     <input type="submit" name="send" value="senden"/>
 </form>
-
-<script type="text/javascript">
-//<![CDATA[
-    $('#ol_version').text(OpenLayers.VERSION_NUMBER);
-//]]>
-</script>
 
 hier ein minimal working example - direkt in json rumschreiben...<br/>
 alternativ kann man eine schöne gui machen die am ende den json string in die passenden post parameter packt.<br/>

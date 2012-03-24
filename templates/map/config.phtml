@@ -177,14 +177,20 @@ $(function()
         <div class="clearall"></div>
     </fieldset>
 
-    <!-- TODO: Clusterer and multiple Properties -->
+    <!--//
+         TODO:
+            - Clusterer
+            - Multiple Properties
+            - send config options
+            - move save button to top
+    //-->
 
     <?php $confStr = json_encode(array('enabled'=>true, 'private'=>$this->configArray)); ?>
-    <textarea name="config"><?php echo $confStr; ?></textarea> <br/>
+    <!-- <textarea name="config"><?php echo $confStr; ?></textarea> <br/> -->
     <input type="submit" name="send" value="senden"/>
 </form>
 
-hier ein minimal working example - direkt in json rumschreiben...<br/>
+<!--// hier ein minimal working example - direkt in json rumschreiben...<br/>
 alternativ kann man eine schöne gui machen die am ende den json string in die passenden post parameter packt.<br/>
 nur der enabled wert und und die private config kann geändert werden. <br/>
-mann muss eingeloggt sein damit es funktioniert. es wird ajax empfohlen weil man sonst auf der standard config seite landet.
+mann muss eingeloggt sein damit es funktioniert. es wird ajax empfohlen weil man sonst auf der standard config seite landet. //-->

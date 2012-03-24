@@ -74,7 +74,7 @@ $(function()
                     </td>
                 </tr>
                 <tr>
-                    <th><?php echo $this->_('Default Layer')?></th>
+                    <th><?php echo $this->_('Default Layer') ?></th>
                     <td>
                         <select name="default.layer">
                             <?php foreach ($this->config->default->_layer as $option): ?>
@@ -118,9 +118,9 @@ $(function()
         <div>
             <table class="separated-vertical">
                 <tr>
-                    <th>Provider</th>
-                    <th>Enabled</th>
-                    <th>API-Key</th>
+                    <th><?php echo $this->_('Provider')?></th>
+                    <th><?php echo $this->_('Enabled')?></th>
+                    <th><?php echo $this->_('API-Key')?></th>
                 </tr>
                 <!--//
                 <tr id="newKey">
@@ -132,12 +132,13 @@ $(function()
                     </td>
                 </tr>
                 //-->
-                <?php foreach ($this->apikey as $provider => $key): ?>
+                <?php foreach ($this->config->load as $provider => $enabled): ?>
                 <tr>
                     <td><?php echo $this->escape($provider) ?></td>
-                    <!--<td><div class="togglebutton" <?php if(isset($extension->enabled) && $extension->enabled){ echo "selected=\"true\""; } ?>></div></td>-->
-                    <td><div class="togglebutton" selected="true" ></div></td>
+                    <td><div class="togglebutton" <?php if(isset($enabled) && $enabled){ echo "selected=\"true\""; } ?>></div></td>
+                    <!--<td><div class="togglebutton" selected="true" ></div></td>-->
                     <td>
+                        <?php $key = $this->config->apikey->$provider; ?>
                         <input class="text width99" type="text" name="apikey.<?php echo $this->escape($provider) ?>" value="<?php echo $this->escape($key) ?>" />
                     </td>
                 </tr>
@@ -146,6 +147,30 @@ $(function()
         </div>
         <div class="clearall"></div>
     </fieldset>
+
+    <fieldset>
+        <legend><?php echo $this->_('Local Map')?></legend>
+        <div>
+            <table class="separated-vertical">
+                <tr>
+                    <th><?php echo $this->_('Titel')?></th>
+                    <td>
+                        <input class="text width99" type="text" name="localMap.titel" value="<?php echo $this->escape($this->config->localMap->titel) ?>" />
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo $this->_('URL')?></th>
+                    <td>
+                        <input class="text width99" type="text" name="localMap.url" value="<?php echo $this->escape($this->config->localMap->url) ?>" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="clearall"></div>
+    </fieldset>
+
+    <!-- TODO: Clusterer and multiple Properties -->
+
     <?php $confStr = json_encode(array('enabled'=>true, 'private'=>$this->configArray)); ?>
     <textarea name="config"><?php echo $confStr; ?></textarea> <br/>
     <input type="submit" name="send" value="senden"/>

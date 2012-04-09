@@ -10,6 +10,7 @@
 :map a doap:Project ;
   doap:name "map" ;
   rdfs:label "Map Extension" ;
+  doap:homepage <https://github.com/AKSW/map.ontowiki>;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
   owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;

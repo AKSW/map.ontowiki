@@ -12,8 +12,16 @@
   rdfs:label "Map Extension" ;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
+  owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;
   doap:release :v1 .
+
 
 :v1 a doap:Version ;
   doap:revision "1.0" ;
+  doap:created "2011-01-01" ;
   doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.0> .
+
+<http://people.comiles.eu/natanael> a foaf:Person;
+  foaf:name "Natanael Arndt" ;
+  foaf:homepage <http://people.comiles.eu/natanael>;
+  foaf:mbox <mailto:arndtn@gmail.com> .

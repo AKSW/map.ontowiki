@@ -11,14 +11,13 @@
 :map a doap:Project ;
   doap:name "map" ;
   rdfs:label "Map Extension" ;
-  doap:homepage <https://github.com/AKSW/map.ontowiki>;
+  doap:homepage <https://github.com/AKSW/map.ontowiki> ;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
   owconfig:authorLabel "Natanael Arndt" ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
   :license "http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)" ;
   owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;
-  doap:release :v1, :v1-1 .
-
+  doap:release :v1, :v1-1 ;
   :confAction "map/config" ;
   owconfig:privateNamespace <https://github.com/AKSW/map/raw/master/doap.n3#> ;
   owconfig:pluginEvent event:onDisplayLiteralPropertyValue ;

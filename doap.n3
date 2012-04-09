@@ -11,11 +11,13 @@
 :map a doap:Project ;
   doap:name "map" ;
   rdfs:label "Map Extension" ;
+  doap:homepage <https://github.com/AKSW/map.ontowiki>;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
   owconfig:authorLabel "Natanael Arndt" ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
   :license "http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)" ;
-  doap:release :v1 ;
+  owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;
+  doap:release :v1, :v1-1 .
 
   :confAction "map/config" ;
   owconfig:privateNamespace <https://github.com/AKSW/map/raw/master/doap.n3#> ;
@@ -111,4 +113,15 @@
 
 :v1 a doap:Version ;
   doap:revision "1.0" ;
+  doap:created "2012-03-12" ;
   doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.0> .
+
+:v1-1 a doap:Version ;
+  doap:revision "1.1" ;
+  doap:created "2012-04-09" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.1> .
+
+<http://people.comiles.eu/natanael> a foaf:Person;
+  foaf:name "Natanael Arndt" ;
+  foaf:homepage <http://people.comiles.eu/natanael>;
+  foaf:mbox <mailto:arndtn@gmail.com> .

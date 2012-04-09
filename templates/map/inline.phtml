@@ -78,16 +78,6 @@ function goForMap () {
     // set the image path to the ontowiki theme's image folder
     manager.imgPath         = '<?php echo $this->themeUrlBase; ?>images/';
 
-    manager.icon = new OpenLayers.Icon(
-        '<?php echo $this->componentUrlBase . $this->config->icon->path; ?>',
-        new OpenLayers.Size(<?php echo $this->config->icon->size; ?>),
-        new OpenLayers.Pixel(<?php echo $this->config->icon->offset; ?>)
-    );
-    manager.clusterIcon = new OpenLayers.Icon(
-        '<?php echo $this->componentUrlBase . $this->config->cluster->path; ?>',
-        new OpenLayers.Size(<?php echo $this->config->cluster->size; ?>),
-        new OpenLayers.Pixel(<?php echo $this->config->cluster->offset; ?>)
-    );
     manager.prepare();
     manager.init();
 }

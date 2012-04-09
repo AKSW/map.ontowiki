@@ -122,18 +122,6 @@ function goForMap () {
     // set the image path to the ontowiki theme's image folder
     <?php echo $this->mapVar; ?>.imgPath         = '<?php echo $this->themeUrlBase; ?>images/';
 
-    <?php echo $this->mapVar; ?>.pic = '<?php echo $this->componentUrlBase . $this->config->icon->path; ?>';
-    <?php echo $this->mapVar; ?>.icon = new OpenLayers.Icon(
-        '<?php echo $this->componentUrlBase . $this->config->icon->path; ?>',
-        new OpenLayers.Size(<?php echo $this->config->icon->size; ?>),
-        new OpenLayers.Pixel(<?php echo $this->config->icon->offset; ?>)
-    );
-    <?php echo $this->mapVar; ?>.clusterIcon = new OpenLayers.Icon(
-        '<?php echo $this->componentUrlBase . $this->config->cluster->path; ?>',
-        new OpenLayers.Size(<?php echo $this->config->cluster->size; ?>),
-        new OpenLayers.Pixel(<?php echo $this->config->cluster->offset; ?>)
-    );
-
     $('body').bind(
         'ontowiki.selection.changed',
         function(event, data)

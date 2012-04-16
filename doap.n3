@@ -14,6 +14,7 @@
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
   owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;
+  owconfig:minOWVersion "0.9.6" ;
   doap:release :v1, :v1-1 .
 
 

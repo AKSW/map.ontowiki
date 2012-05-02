@@ -7,19 +7,56 @@
 @prefix : <https://raw.github.com/AKSW/map.ontowiki/master/doap.n3#> .
 
 <> foaf:primaryTopic :map .
-
 :map a doap:Project ;
   doap:name "map" ;
   rdfs:label "Map Extension" ;
-  doap:homepage <https://github.com/AKSW/map.ontowiki> ;
+  doap:homepage <https://github.com/AKSW/map.ontowiki>;
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
-  owconfig:authorLabel "Natanael Arndt" ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
   :license "http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)" ;
+
+  owconfig:privateNamespace : ;
+  owconfig:enabled "true"^^xsd:boolean ;
+  owconfig:templates "templates/" ;
+  owconfig:languages "languages/" ;
+  owconfig:pluginEvent event:onDisplayLiteralPropertyValue ;
+  owconfig:hasModule :mapModule ;
+
   owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;
   doap:release :v1, :v1-1, :v1-2 .
 
-:this owconfig:config [
+
+:v1 a doap:Version ;
+  doap:revision "1.0" ;
+  doap:created "2012-03-12" ;
+  owconfig:minOWVersion "0.9.6" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.0> .
+
+:v1-1 a doap:Version ;
+  doap:revision "1.1" ;
+  doap:created "2012-04-09" ;
+  owconfig:minOWVersion "0.9.6" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.1> .
+
+:v1-2 a doap:Version ;
+  doap:revision "1.2" ;
+  doap:created "2012-05-02" ;
+  owconfig:minOWVersion "0.9.7" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.2> .
+
+<http://people.comiles.eu/natanael> a foaf:Person;
+  foaf:name "Natanael Arndt" ;
+  foaf:homepage <http://people.comiles.eu/natanael>;
+  foaf:mbox <mailto:arndtn@gmail.com> .
+
+:mapModule a owconfig:Module ;
+  rdfs:label "Map" ;
+  owconfig:priority "10" ;
+  rdfs:label "Map" ;
+  owconfig:context "main.window.properties" ;
+  owconfig:context "main.window.instances" .
+
+:map owconfig:config [
       a owconfig:Config;
       owconfig:id "show";
       :_tab "auto" ;
@@ -30,16 +67,16 @@
  owconfig:config [
       a owconfig:Config;
       owconfig:id "load";
-      :osm "1" ;
-      :google "" ;
-      :localMap "" ;
-      :yahoo ""
+      :osm "true"^^xsd:boolean ;
+      :google "false"^^xsd:boolean ;
+      :localMap "false"^^xsd:boolean ;
+      :yahoo "false"^^xsd:boolean
 ];
  owconfig:config [
       a owconfig:Config;
       owconfig:id "localMap";
       :titel "Local Map" ;
-      :url "http://localhost/tiles/${z}/${x}/${y}.png"
+      :url "http://localhost/tiles/\\${z}/\\${x}/\\${y}.png"
 ];
  owconfig:config [
       a owconfig:Config;
@@ -58,10 +95,10 @@
       a owconfig:Config;
       owconfig:id "property";
       :_latitude <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ;
-      :_latitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Latitude> ;
+      :latitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Latitude> ;
       :latitude <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ;
       :_longitude <http://www.w3.org/2003/01/geo/wgs84_pos#long> ;
-      :_longitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Longitude> ;
+      :longitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Longitude> ;
       :longitude <http://www.w3.org/2003/01/geo/wgs84_pos#long>
 ];
  owconfig:config [
@@ -96,26 +133,3 @@
   :dontShowController "debug" ;
   :dontShowController "module" ;
   :dontShowController "index" .
-
-:v1 a doap:Version ;
-  doap:revision "1.0" ;
-  doap:created "2012-03-12" ;
-  owconfig:minOWVersion "0.9.6" ;
-  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.0> .
-
-:v1-1 a doap:Version ;
-  doap:revision "1.1" ;
-  doap:created "2012-04-09" ;
-  owconfig:minOWVersion "0.9.6" ;
-  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.1> .
-
-:v1-2 a doap:Version ;
-  doap:revision "1.2" ;
-  doap:created "2012-05-02" ;
-  owconfig:minOWVersion "0.9.7" ;
-  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.2> .
-
-<http://people.comiles.eu/natanael> a foaf:Person;
-  foaf:name "Natanael Arndt" ;
-  foaf:homepage <http://people.comiles.eu/natanael>;
-  foaf:mbox <mailto:arndtn@gmail.com> .

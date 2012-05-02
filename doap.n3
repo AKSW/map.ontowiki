@@ -14,7 +14,7 @@
   doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo." ;
   doap:maintainer <http://people.comiles.eu/natanael> ;
   owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;
-  doap:release :v1, :v1-1 .
+  doap:release :v1, :v1-1, :v1-2 .
 
 
 :v1 a doap:Version ;
@@ -28,6 +28,12 @@
   doap:created "2012-04-09" ;
   owconfig:minOWVersion "0.9.6" ;
   doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.1> .
+
+:v1-2 a doap:Version ;
+  doap:revision "1.2" ;
+  doap:created "2012-05-02" ;
+  owconfig:minOWVersion "0.9.7" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.2> .
 
 <http://people.comiles.eu/natanael> a foaf:Person;
   foaf:name "Natanael Arndt" ;

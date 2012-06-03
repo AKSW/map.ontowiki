@@ -6,7 +6,7 @@ require_once $this->_componentRoot.'classes/Cluster.php';
  * The Clusterer object controlls the creation of the clusters on the map
  *
  * @category OntoWiki
- * @package OntoWiki_extensions_components_map
+ * @package Extensions_Map_Classes
  * @author Natanael Arndt <arndtn@gmail.com>
  * @author OW MapPlugin-Team <mashup@comiles.eu>
  */

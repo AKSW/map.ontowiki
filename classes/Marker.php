@@ -7,7 +7,7 @@
  * will later be shown on a map.
  *
  * @category OntoWiki
- * @package OntoWiki_extensions_components_map
+ * @package Extensions_Map_Classes
  * @author Natanael Arndt <arndtn@gmail.com>
  * @author OW MapPlugin-Team <mashup@comiles.eu>
  */

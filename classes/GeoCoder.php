@@ -9,7 +9,7 @@ require_once $this->_componentRoot . 'classes/Marker.php';
  * TODO Caching!!!
  *
  * @category    OntoWiki
- * @package     OntoWiki_extensions_components_map
+ * @package     Extensions_Map_Classes
  * @author      OW MapPlugin-Team <mashup@comiles.eu>
  * @author      Natanael Arndt <arndtn@gmail.com>
  */

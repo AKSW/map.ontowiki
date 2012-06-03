@@ -7,9 +7,9 @@
  * shows a short statistical summary about geographical data in a ressource
  *
  * @category OntoWiki
- * @package OntoWiki_extensions_components_map
+ * @package Extensions_Map
  * @author Natanael Arndt <arndtn@gmail.com>
- * @copyright Copyright (c) 2008, {@link http://aksw.org AKSW}
+ * @copyright Copyright (c) 2012, {@link http://aksw.org AKSW}
  * @license http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)
  */
 class MapModule extends OntoWiki_Module

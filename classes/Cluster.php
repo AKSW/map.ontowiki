@@ -6,7 +6,7 @@ require_once $this->_componentRoot.'classes/Marker.php';
  * Cluster-Class of the OW MapPlugin
  *
  * @category OntoWiki
- * @package OntoWiki_extensions_components_map
+ * @package Extensions_Map_Classes
  * @author Natanael Arndt <arndtn@gmail.com>
  * @author OW MapPlugin-Team <mashup@comiles.eu>
  */

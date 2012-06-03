@@ -4,7 +4,7 @@
  * Map component controller.
  *
  * @category OntoWiki
- * @package OntoWiki_extensions_components_map
+ * @package Extensions_Map
  * @author Natanael Arndt <arndtn@gmail.com>
  * TODO comments
  */

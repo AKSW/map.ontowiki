@@ -20,6 +20,7 @@ class MapHelper extends OntoWiki_Component_Helper
     private $_dirInstances = null;
     private $_indInstances = null;
     private $_listHelper = null;
+    private $_navigation = null;
 
     public function init()
     {
@@ -46,14 +47,18 @@ class MapHelper extends OntoWiki_Component_Helper
         if ($onSwitch) {
             // register new tab
 
-            if (!OntoWiki_Navigation::isRegistered('map')) {
-                OntoWiki_Navigation::register(
+            if ($this->_navigation == null) {
+                $this->_navigation = $owApp->getNavigation();
+            }
+
+            if (!$this->_navigation->isRegistered('map')) {
+                $this->_navigation->register(
                     'map',
                     array(
                         'controller' => 'map',
                         'action'     => 'display',
                         'name'       => 'Map',
-                        'priority'   => 20,
+                        'priority'   => 100,
                         'active'     => false
                     )
                 );

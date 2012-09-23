@@ -35,7 +35,7 @@ class MapModule extends OntoWiki_Module
     public function shouldShow()
     {
         $logger = OntoWiki::getInstance()->logger;
-        $logger->debug('shouldShow?');
+        $logger->debug('MapModule/shouldShow?');
         if (class_exists('MapHelper')) {
             $helper = $this->_owApp->extensionManager->getComponentHelper('map');
             // $helper = new MapHelper($this->_owApp->extensionManager);

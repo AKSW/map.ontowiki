@@ -226,8 +226,8 @@ class MapController extends OntoWiki_Controller_Component
         /**
          * read configuration
          */
-        $latProperties  = $this->_privateConfig->property->latitude->toArray();
-        $longProperties = $this->_privateConfig->property->longitude->toArray();
+        $latProperties  = (array) $this->_privateConfig->property->latitude;
+        $longProperties = (array) $this->_privateConfig->property->longitude;
         $latProperty    = $latProperties[0];
         $longProperty   = $longProperties[0];
 
@@ -275,8 +275,8 @@ class MapController extends OntoWiki_Controller_Component
         /**
          * read configuration
          */
-        $latProperties  = $this->_privateConfig->property->latitude->toArray();
-        $longProperties = $this->_privateConfig->property->longitude->toArray();
+        $latProperties  = (array) $this->_privateConfig->property->latitude;
+        $longProperties = (array) $this->_privateConfig->property->longitude;
         $latProperty    = $latProperties[0];
         $longProperty   = $longProperties[0];
 

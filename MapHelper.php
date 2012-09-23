@@ -38,6 +38,7 @@ class MapHelper extends OntoWiki_Component_Helper
             } else if ($this->_privateConfig->show->tab == 'never') {
                 $onSwitch = false;
             } else {
+                $logger->debug('MapHelper/init check if tab should be showen');
                 $onSwitch = $this->shouldShow();
             }
         } else {
@@ -122,14 +123,16 @@ class MapHelper extends OntoWiki_Component_Helper
             $dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
             $indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
 
-            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
-            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
+            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '", #' . count($dirResult) . '.');
+            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '", #' . count($indResult) . '.');
 
-            if ($dirResult OR $indResult) {
+            if ((count($dirResult) > 0) || (count($indResult) > 0)) {
                 $result = true;
             } else {
                 $result = false;
             }
+
+            $owApp->logger->debug('MapHelper/shouldShow: show map in properties view: ' . $result);
 
             return $result;
         } else if ($this->_owApp->lastRoute == 'instances') {
@@ -205,10 +208,10 @@ class MapHelper extends OntoWiki_Component_Helper
                     $dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
                     $indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
 
-                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
-                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
+                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '", #' . count($dirResult) . '.');
+                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '", #' . count($indResult) . '.');
 
-                    if ($dirResult OR $indResult) {
+                    if ((count($dirResult) > 0) || (count($indResult) > 0)) {
                         $result = true;
                     } else {
                         $result = false;
@@ -221,6 +224,8 @@ class MapHelper extends OntoWiki_Component_Helper
                     );
                     $result = true;
                 }
+
+                $owApp->logger->debug('MapHelper/shouldShow: show map in instances view: ' . $result);
 
                 return $result;
             }

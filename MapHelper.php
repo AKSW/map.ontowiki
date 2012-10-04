@@ -76,6 +76,7 @@ class MapHelper extends OntoWiki_Component_Helper
         $owApp = OntoWiki::getInstance();
         $logger = $owApp->logger;
         $logger->debug('shouldShow Helper');
+
         if ($this->_listHelper == null) {
             $this->_listHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('List');
         }
@@ -90,8 +91,8 @@ class MapHelper extends OntoWiki_Component_Helper
 
         $listName = "instances";
 
-        $latProperties  = (array) $this->_privateConfig->property->latitude;
-        $longProperties = (array) $this->_privateConfig->property->longitude;
+        $latProperties  = $this->_privateConfig->property->latitude->toArray();
+        $longProperties = $this->_privateConfig->property->longitude->toArray();
         $latProperty    = $latProperties[0];
         $longProperty   = $longProperties[0];
 
@@ -136,7 +137,8 @@ class MapHelper extends OntoWiki_Component_Helper
 
             return $result;
         } else if ($this->_owApp->lastRoute == 'instances') {
-            if (!$front->getRequest()->isXmlHttpRequest() && $this->_listHelper->listExists($listName)) {
+            //if (!$front->getRequest()->isXmlHttpRequest() && $this->_listHelper->listExists($listName)) {
+            if ($this->_listHelper->listExists($listName)) {
                 $instances = $this->_listHelper->getList($listName);
 
                 $latVar         = new Erfurt_Sparql_Query2_Var('lat');

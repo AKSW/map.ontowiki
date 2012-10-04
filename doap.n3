@@ -53,15 +53,19 @@
   rdfs:label "Map" ;
   owconfig:priority "10" ;
   rdfs:label "Map" ;
-  owconfig:context "main.window.properties" ;
-  owconfig:context "main.window.instances" .
+  owconfig:context (
+    "main.window.properties"
+    "main.window.instances"
+  ) .
 
 :map owconfig:config [
       a owconfig:Config;
       owconfig:id "show";
-      :_tab "auto" ;
-      :_tab "never" ;
-      :_tab "ever" ;
+      :_tab (
+        "auto"
+        "never"
+        "ever"
+      ) ;
       :tab "auto"
 ];
  owconfig:config [
@@ -81,12 +85,14 @@
  owconfig:config [
       a owconfig:Config;
       owconfig:id "default";
-      :_layer "Google Streets" ;
-      :_layer "Google Hybrid" ;
-      :_layer "Google Satellite" ;
-      :_layer "Google Physical" ;
-      :_layer "OpenStreetMap" ;
-      :_layer "Local Map" ;
+      :_layer (
+        "Google Streets"
+        "Google Hybrid"
+        "Google Satellite"
+        "Google Physical"
+        "OpenStreetMap"
+        "Local Map"
+      ) ;
       :layer "OpenStreetMap" ;
       :latitude "51.33687" ;
       :longitude "12.38538"
@@ -94,12 +100,16 @@
  owconfig:config [
       a owconfig:Config;
       owconfig:id "property";
-      :_latitude <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ;
-      :latitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Latitude> ;
-      :latitude <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ;
-      :_longitude <http://www.w3.org/2003/01/geo/wgs84_pos#long> ;
-      :longitude <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Longitude> ;
-      :longitude <http://www.w3.org/2003/01/geo/wgs84_pos#long>
+      :_latitude (
+        <http://www.w3.org/2003/01/geo/wgs84_pos#lat>
+        <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Latitude>
+      ) ;
+      :latitude (<http://www.w3.org/2003/01/geo/wgs84_pos#lat>) ;
+      :_longitude (
+        <http://www.w3.org/2003/01/geo/wgs84_pos#long>
+        <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Longitude>
+      ) ;
+      :longitude (<http://www.w3.org/2003/01/geo/wgs84_pos#long>)
 ];
  owconfig:config [
       a owconfig:Config;
@@ -127,9 +137,11 @@
       :gridCount "10" ;
       :maxMarkers "4"
 ];
- :dontShowController "model" ;
-  :dontShowController "application" ;
-  :dontShowController "error" ;
-  :dontShowController "debug" ;
-  :dontShowController "module" ;
-  :dontShowController "index" .
+ :dontShowController (
+      "model"
+      "application"
+      "error"
+      "debug"
+      "module"
+      "index"
+ ) .

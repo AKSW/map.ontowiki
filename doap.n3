@@ -55,7 +55,7 @@
   rdfs:label "Map" ;
   owconfig:context (
     "main.window.properties"
-    "main.window.instances"
+    "main.window.list"
   ) .
 
 :map owconfig:config [

@@ -40,7 +40,7 @@
 
 :v1-2 a doap:Version ;
   doap:revision "1.2" ;
-  doap:created "2012-05-02" ;
+  doap:created "2012-10-04" ;
   owconfig:minOWVersion "0.9.7" ;
   doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.2> .
 

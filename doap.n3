@@ -1,0 +1,189 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owconfig: <http://ns.ontowiki.net/SysOnt/ExtensionConfig/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix event: <http://ns.ontowiki.net/SysOnt/Events/> .
+@prefix : <https://github.com/AKSW/map/raw/master/doap.n3#> .
+
+<> foaf:primaryTopic :map .
+:map a doap:Project ;
+  doap:name "map" ;
+  rdfs:label "Map and Geocoder" ;
+  doap:homepage <https://github.com/AKSW/map.ontowiki>;
+  doap:description "Show resources on a map. Supports Google Maps, OpenStreetMap and Yahoo. Furthermore it connects geocoding APIs (currently just google)." ;
+  doap:maintainer <http://aksw.org/NatanaelArndt>, <http://aksw.org/MichaelMartin> ;
+  :license "http://opensource.org/licenses/gpl-license.php GNU General Public License (GPL)" ;
+
+  owconfig:privateNamespace : ;
+  owconfig:enabled "true"^^xsd:boolean ;
+  owconfig:templates "templates/" ;
+  owconfig:languages "languages/" ;
+  owconfig:pluginEvent event:onDisplayLiteralPropertyValue ;
+  owconfig:hasModule :Map ;
+  owconfig:registeredAt <http://extensions.ontowiki.net/repository> ;
+  doap:release :v1, :v1-1, :v1-2 .
+
+
+:v1 a doap:Version ;
+  doap:revision "1.0" ;
+  doap:created "2012-03-12" ;
+  owconfig:minOWVersion "0.9.6" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.0> .
+
+:v1-1 a doap:Version ;
+  doap:revision "1.1" ;
+  doap:created "2012-04-09" ;
+  owconfig:minOWVersion "0.9.6" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.1> .
+
+:v1-2 a doap:Version ;
+  doap:revision "1.2" ;
+  doap:created "2012-10-04" ;
+  owconfig:minOWVersion "0.9.7" ;
+  doap:file-release <https://github.com/AKSW/map.ontowiki/zipball/v1.2> .
+
+<http://aksw.org/NatanaelArndt> a foaf:Person;
+  foaf:name "Natanael Arndt" ;
+  foaf:homepage <http://aksw.org/NatanaelArndt>;
+  foaf:mbox <mailto:arndt@informatik.uni-leipzig.de> .
+
+<http://aksw.org/MichaelMartin> a foaf:Person;
+  foaf:name "Michael Martin" ;
+  foaf:homepage <http://aksw.org/Michael Martin>;
+  foaf:mbox <mailto:martin@informatik.uni-leipzig.de> .
+
+:Map a owconfig:Module ;
+  rdfs:label "Map" ;
+  owconfig:priority "10" ;
+  rdfs:label "Map" ;
+  owconfig:context (
+    "main.window.properties"
+    "main.window.list"
+    "main.window.geocode"
+    "main.window.modelinfo"
+    "main.window.dashmodelinfo"
+  ) .
+
+:map :dontShowController (
+       "model"
+       "application"
+       "error"
+       "debug"
+       "module"
+       "index"
+     );
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "show";
+       :_tab (
+         "auto"
+         "never"
+         "ever"
+       ) ;
+       :tab "auto"
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "load";
+       :osm "true"^^xsd:boolean ;
+       :google "false"^^xsd:boolean ;
+       :localMap "false"^^xsd:boolean ;
+       :yahoo "false"^^xsd:boolean
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "localMap";
+       :titel "Local Map" ;
+       :url "http://localhost/tiles/\\${z}/\\${x}/\\${y}.png"
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "default";
+       :_layer (
+         "Google Streets"
+         "Google Hybrid"
+         "Google Satellite"
+         "Google Physical"
+         "OpenStreetMap"
+         "Local Map"
+       ) ;
+       :layer "OpenStreetMap" ;
+       :latitude "51.33687" ;
+       :longitude "12.38538"
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "property";
+       :_latitude (
+         <http://www.w3.org/2003/01/geo/wgs84_pos#lat>
+         <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Latitude>
+       ) ;
+       :latitude (<http://www.w3.org/2003/01/geo/wgs84_pos#lat>) ;
+       :_longitude (
+         <http://www.w3.org/2003/01/geo/wgs84_pos#long>
+         <http://www.uni-leipzig.de/unigeschichte/professorenkatalog/Longitude>
+       ) ;
+       :longitude (<http://www.w3.org/2003/01/geo/wgs84_pos#long>) ;
+       :street (<http://ns.aksw.org/addressFeatures/physical/street>) ;
+       :housenumber (<http://ns.aksw.org/addressFeatures/physical/houseNumber>) ;
+       :postcode (<http://ns.aksw.org/addressFeatures/physical/zip>) ;
+       :city (<http://ns.aksw.org/addressFeatures/physical/city>) ;
+       :country (<http://ns.aksw.org/addressFeatures/physical/country>) ;
+       :accuracy (<http://ns.aksw.org/spatialFeatures/accuracy>) ;
+       :type (<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>)
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "apikey";
+       :google "ABQIAAAAynyr50kleiy5o-uQwf2tTBRnE7oD7ulPnCTyuIl4SzAcqF9XxBSKle9ZP7LcJUMzGgym1wQT_TV0Uw" ;
+       :yahoo "P7p9l9zV34H4XCVwfyOYUjckKPEttCqyczem_IO2xqjKkTk3G_TPf1fQtxlSk57Q8B0e8Sw-"
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "icon";
+       :path "../../themes/silverblue/images/marker.png" ;
+       :size "10,10" ;
+       :offset "-5,-5"
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "cluster";
+       :path "../../themes/silverblue/images/cluster-marker.png" ;
+       :size "20,20" ;
+       :offset "-10,-10"
+     ];
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "clusterer";
+       :gridCount "10" ;
+       :maxMarkers "4"
+     ];
+     :exampleQuery """
+       SELECT ?uri ?street ?city ?postalcode ?country
+       WHERE
+       {
+           ?uri rdf:type foaf:Person .
+           OPTIONAL { ?uri myModel:country ?countryUri. ?countryUri rdfs:label ?country } .
+           OPTIONAL { ?uri myModel:city ?cityUri.?cityUri rdfs:label ?city } .
+           OPTIONAL { ?uri myModel:postalcode ?postalcode } .
+           OPTIONAL { ?uri myModel:street ?street } .
+       }
+     """ ;
+     :geocodeAccuracyLimit "5" ;
+     :active_geocoders_ (
+       "bing"
+       "postcodeNL"
+       "yahoo"
+     );
+     :active_geocoders (
+       "geonames"
+       "google"
+       "nominatim"
+       "yahooPF"
+     );
+     owconfig:config [
+       a owconfig:Config;
+       owconfig:id "type";
+       :poi <http://vakantieland.nl/catalogue/classes/POI>
+     ] .

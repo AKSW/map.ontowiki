@@ -7,8 +7,7 @@
  *
  * @category OntoWiki
  * @package Extensions_Map
- * @author Natanael Arndt <arndtn@gmail.com>
- * TODO comments
+ * @author Natanael Arndt <arndt@informatik.uni-leipzig.de>
  */
 class MapHelper extends OntoWiki_Component_Helper
 {
@@ -17,17 +16,15 @@ class MapHelper extends OntoWiki_Component_Helper
      * Object holding the Instances with direct geo properties (e.g.: geo:long, geo:lat)
      * and the other one with indirect geo properties (e.g.: foaf:based_near)
      */
-    private $_dirInstances = null;
-    private $_indInstances = null;
     private $_listHelper = null;
     private $_navigation = null;
 
     public function init()
     {
+        // get OntoWiki instance because it is not present during init
         $owApp = OntoWiki::getInstance();
 
-        $logger = $owApp->logger;
-        $logger->debug('Initializing MapPlugin Helper');
+        $owApp->logger->debug('Initializing MapPlugin Helper');
 
         // decide, if map should be on
         $onSwitch = false;
@@ -46,7 +43,6 @@ class MapHelper extends OntoWiki_Component_Helper
 
         if ($onSwitch) {
             // register new tab
-
             if ($this->_navigation == null) {
                 $this->_navigation = $owApp->getNavigation();
             }
@@ -66,29 +62,22 @@ class MapHelper extends OntoWiki_Component_Helper
         }
     }
 
+    /**
+     * Checks if the map tab or the map module should be shown.
+     * It executes two queries to see if the selected resources have direct or indirect geographical
+     * properties.
+     *
+     * @return boolean true if it should be shown, false if not
+     */
     public function shouldShow ()
     {
-        /**
-         * for debug output
-         * @var OntoWiki Instance of the App-Object
-         */
-        $owApp = OntoWiki::getInstance();
-        $logger = $owApp->logger;
-        $logger->debug('shouldShow Helper');
+        $this->_owApp->logger->debug('shouldShow Helper');
 
         if ($this->_listHelper == null) {
             $this->_listHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('List');
         }
 
-        /*
-         * don't show on model, application, error, debug, module and index controller
-         */
-        /*
-           $session = $owApp->session;
-         */
-        $front  = Zend_Controller_Front::getInstance();
-
-        $listName = "instances";
+        $listName = 'instances';
 
         $latProperties  = $this->_privateConfig->property->latitude->toArray();
         $longProperties = $this->_privateConfig->property->longitude->toArray();
@@ -96,8 +85,6 @@ class MapHelper extends OntoWiki_Component_Helper
         $longProperty   = $longProperties[0];
 
         if ($this->_owApp->lastRoute == 'properties' && $this->_owApp->selectedResource != null) {
-            //$this->_owApp->selectedResource;
-
             $dirQuery = '
                 SELECT ?lat ?long
                 WHERE {
@@ -112,10 +99,10 @@ class MapHelper extends OntoWiki_Component_Helper
                     <' . $longProperty . '> ?long2.
                 }';
 
-            $owApp->logger->debug(
+            $this->_owApp->logger->debug(
                 'MapHelper/shouldShow: sent "' . $dirQuery . '" to know if SpacialThings are available.'
             );
-            $owApp->logger->debug(
+            $this->_owApp->logger->debug(
                 'MapHelper/shouldShow: sent "' . $indQuery . '" to know if SpacialThings are available.'
             );
 
@@ -123,10 +110,10 @@ class MapHelper extends OntoWiki_Component_Helper
             $dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
             $indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
 
-            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
-            $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
+            $this->_owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
+            $this->_owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
 
-            if ($dirResult OR $indResult) {
+            if ($dirResult || $indResult) {
                 $result = true;
             } else {
                 $result = false;
@@ -134,71 +121,58 @@ class MapHelper extends OntoWiki_Component_Helper
 
             return $result;
         } else if ($this->_owApp->lastRoute == 'instances') {
-            //if (!$front->getRequest()->isXmlHttpRequest() && $this->_listHelper->listExists($listName)) {
             if ($this->_listHelper->listExists($listName)) {
-                $instances = $this->_listHelper->getList($listName);
+                $resourceVar = $this->_listHelper->getList($listName)->getResourceVar();
+                $instancesQuery = $this->_listHelper->getList($listName)->getResourceQuery();
 
                 $latVar         = new Erfurt_Sparql_Query2_Var('lat');
                 $longVar        = new Erfurt_Sparql_Query2_Var('long');
                 $indirLatVar    = new Erfurt_Sparql_Query2_Var('lat2');
                 $indirLongVar   = new Erfurt_Sparql_Query2_Var('long2');
 
-                if ($this->_dirInstances === null) {
-                    $this->_dirInstances = clone $instances;
-                } else {
-                    $owApp->logger->debug('MapHelper/shouldShow: this->_dirInstances already set');
-                    // don't load instances again
-                }
+                $dirQuery = clone $instancesQuery;
+                $indQuery = clone $instancesQuery;
 
-                if ($this->_indInstances === null) {
-                    $this->_indInstances = clone $instances;
-                } else {
-                    $owApp->logger->debug('MapHelper/shouldShow: this->_indInstances already set');
-                    // don't load instances again
-                }
-
-                $this->_dirInstances->setLimit(1);
-                $this->_dirInstances->setOffset(0);
-                $this->_indInstances->setLimit(1);
-                $this->_indInstances->setOffset(0);
+                $dirQuery->setLimit(1);
+                $dirQuery->setOffset(0);
+                $indQuery->setLimit(1);
+                $indQuery->setOffset(0);
 
                 /**
                  * Direct Query, to check for direct geoproperties
                  */
-                $dirQuery  = $this->_dirInstances->getResourceQuery();
                 $dirQuery->setQueryType(Erfurt_Sparql_Query2::typeSelect); /* would like to ask but ask lies */
                 $dirQuery->removeAllOptionals()->removeAllProjectionVars();
 
                 /**
                  * Indirect Query, to check for indirect geoproperties
                  */
-                $indQuery  = $this->_indInstances->getResourceQuery();
                 $indQuery->setQueryType(Erfurt_Sparql_Query2::typeSelect); /* would like to ask but ask lies */
                 $indQuery->removeAllOptionals()->removeAllProjectionVars();
 
-                $dirQuery->addProjectionVar($this->_dirInstances->getResourceVar());
+                $dirQuery->addProjectionVar($resourceVar);
                 $dirQuery->addProjectionVar($latVar);
                 $dirQuery->addProjectionVar($longVar);
 
-                $indQuery->addProjectionVar($this->_indInstances->getResourceVar());
+                $indQuery->addProjectionVar($resourceVar);
                 $indQuery->addProjectionVar($indirLatVar);
                 $indQuery->addProjectionVar($indirLongVar);
 
-                $dirQuery->addTriple($this->_dirInstances->getResourceVar(), $latProperty, $latVar);
-                $dirQuery->addTriple($this->_dirInstances->getResourceVar(), $longProperty, $longVar);
+                $dirQuery->addTriple($resourceVar, $latProperty, $latVar);
+                $dirQuery->addTriple($resourceVar, $longProperty, $longVar);
 
                 // should be a Erfurt_Sparql_Query2_BlankNode but i heard this is not supported by zendb
                 $node     = new Erfurt_Sparql_Query2_Var('node');
                 $indQuery->addTriple(
-                    $this->_indInstances->getResourceVar(), new Erfurt_Sparql_Query2_Var('pred'), $node
+                    $resourceVar, new Erfurt_Sparql_Query2_Var('pred'), $node
                 );
                 $indQuery->addTriple($node, $latProperty, $indirLatVar);
                 $indQuery->addTriple($node, $longProperty, $indirLongVar);
 
-                $owApp->logger->debug(
+                $this->_owApp->logger->debug(
                     'MapHelper/shouldShow: sent "' . $dirQuery . '" to know if SpacialThings are available.'
                 );
-                $owApp->logger->debug(
+                $this->_owApp->logger->debug(
                     'MapHelper/shouldShow: sent "' . $indQuery . '" to know if SpacialThings are available.'
                 );
 
@@ -207,19 +181,19 @@ class MapHelper extends OntoWiki_Component_Helper
                     $dirResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($dirQuery);
                     $indResult   = $this->_owApp->erfurt->getStore()->sparqlQuery($indQuery);
 
-                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
-                    $owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
+                    $this->_owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($dirResult, true) . '".');
+                    $this->_owApp->logger->debug('MapHelper/shouldShow: got respons "' . var_export($indResult, true) . '".');
 
-                    if ($dirResult OR $indResult) {
+                    if ($dirResult || $indResult) {
                         $result = true;
                     } else {
                         $result = false;
                     }
                 } catch (Erfurt_Store_Adapter_Exception $e) {
-                    $owApp->logger->err(
+                    $this->_owApp->logger->err(
                         'Caught exception on query, but I am just a Helper, but I will show anyways: ',
                         $e->getMessage(),
-                        "\n"
+                        PHP_EOL
                     );
                     $result = true;
                 }
@@ -228,12 +202,12 @@ class MapHelper extends OntoWiki_Component_Helper
             }
         }
 
-        if ($front->getRequest()->isXmlHttpRequest()) {
-            $owApp->logger->debug('MapHelper/shouldShow: xmlHttpRequest → no map.');
+        if (Zend_Controller_Front::getInstance()->getRequest()->isXmlHttpRequest()) {
+            $this->_owApp->logger->debug('MapHelper/shouldShow: xmlHttpRequest → no map.');
         } else if (!$this->_listHelper->listExists($listName)) {
-            $owApp->logger->debug('MapHelper/shouldShow: no instances list found → no instances to show → no map.');
+            $this->_owApp->logger->debug('MapHelper/shouldShow: no instances list found → no instances to show → no map.');
         } else {
-            $owApp->logger->debug(
+            $this->_owApp->logger->debug(
                 'MapHelper/shouldShow: decided to hide the map, but not because of a XmlHttpRequest and not, because '
                 . 'there is no valide session.'
             );
@@ -242,4 +216,3 @@ class MapHelper extends OntoWiki_Component_Helper
         return false;
     }
 }
-

@@ -1,17 +1,11 @@
 <?php
 /**
  * OntoWiki minimap module template
- *
- * @version $Id: showproperties.phtml 4143 2009-09-08 12:26:52Z jonas.brekle $
  */
 ?>
 <div id="miniMap" class="is-processing width99">
 </div>
 <script type="text/javascript">
-
-//    $('#miniMap').addClass('is-processing');
-//    $('#miniMap').addClass('width99');
-//    $('#miniMap').height( $('#miniMap').width() ); 
 
 <?php
     $htmlPartialUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'display'));
@@ -22,7 +16,7 @@
 ?>
 
 $.get(
-    '<?php echo $htmlPartialUrl; ?>',
+    '<?= $htmlPartialUrl ?>',
     function (data)
     {
         $('#miniMap').removeClass('is-processing');

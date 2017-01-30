@@ -89,7 +89,10 @@ class MapController extends OntoWiki_Controller_Component
             $this->addModuleContext('main.window.map');
             $this->view->placeholder('main.window.title')->set('OntoWiki Map Component');
 
-            $jsonRequestUrl = new OntoWiki_Url(array('controller' => 'map', 'action' => 'marker'), array());
+            $jsonRequestUrl = new OntoWiki_Url(
+                array('controller' => 'map', 'action' => 'marker'),
+                array()
+            );
             $jsonRequestUrl->setParam('use_limit', 'off', true);
             $jsonRequestUrl->setParam('extent', '__extent__', true);
 
@@ -106,7 +109,8 @@ class MapController extends OntoWiki_Controller_Component
             $this->view->mapVar           = 'manager';
 
             $this->_owApp->logger->debug(
-                'MapComponent/displayAction: maximal map extention: ' . var_export($this->view->extent, true)
+                'MapComponent/displayAction: maximal map extention: '
+                . var_export($this->view->extent, true)
             );
         }
     }
@@ -155,8 +159,13 @@ class MapController extends OntoWiki_Controller_Component
                  */
                 $uri = isset($r[$this->_resourceVar]) ? $r[$this->_resourceVar] : $this->_resource;
 
-                if (empty ($r['lat']) || empty ($r['long'])) {
-                    if (isset($r['lat2']) && isset($r['long2']) && !empty($r['lat2']) && !empty($r['long2'])) {
+                if (empty($r['lat']) || empty($r['long'])) {
+                    if (
+                        isset($r['lat2']) &&
+                        isset($r['long2']) &&
+                        !empty($r['lat2']) &&
+                        !empty($r['long2'])
+                    ) {
                         $lat = $r['lat2'];
                         $long = $r['long2'];
                     }
@@ -255,13 +264,15 @@ class MapController extends OntoWiki_Controller_Component
                 $bnd[$key] = new Erfurt_Sparql_Query2_RDFLiteral($_bnd, $datatype);
             }
 
-            $bnd['top'] = new Erfurt_Sparql_Query2_Smaller('?lat',  $bnd['top']);
+            $bnd['top'] = new Erfurt_Sparql_Query2_Smaller('?lat', $bnd['top']);
             $bnd['rgt'] = new Erfurt_Sparql_Query2_Smaller('?long', $bnd['rgt']);
-            $bnd['btm'] = new Erfurt_Sparql_Query2_Larger('?lat',   $bnd['btm']);
-            $bnd['lft'] = new Erfurt_Sparql_Query2_Larger('?long',  $bnd['lft']);
+            $bnd['btm'] = new Erfurt_Sparql_Query2_Larger('?lat', $bnd['btm']);
+            $bnd['lft'] = new Erfurt_Sparql_Query2_Larger('?long', $bnd['lft']);
             $dttyps[]   = new Erfurt_Sparql_Query2_ConditionalAndExpression($bnd);
         }
-        $filter = new Erfurt_Sparql_Query2_Filter(new Erfurt_Sparql_Query2_ConditionalOrExpression($dttyps));
+        $filter = new Erfurt_Sparql_Query2_Filter(
+            new Erfurt_Sparql_Query2_ConditionalOrExpression($dttyps)
+        );
 
         $this->_session->instances->addTripleFilter($filter, "mapBounds");
     }
@@ -270,7 +281,7 @@ class MapController extends OntoWiki_Controller_Component
      * Get the markers in the specified area
      * TODO implement using the viewArea
      */
-    private function _getResources( $viewArea = false )
+    private function _getResources($viewArea = false)
     {
         /**
          * read configuration
@@ -301,7 +312,7 @@ class MapController extends OntoWiki_Controller_Component
                     $this->_instances = clone $list;
                 } else {
                     //error
-                    $this->_owApp->logger->error(
+                    $this->_owApp->logger->err(
                         'MapComponent/_getResources: list "' . $listName .'" doesn\'t exist in listHelper'
                     );
                     //$this->_instances = new QueryObject();
@@ -332,8 +343,12 @@ class MapController extends OntoWiki_Controller_Component
 
             // should be $node = new Erfurt_Sparql_Query2_BlankNode('bn') but I heard this is not supported by zendb
             $node = new Erfurt_Sparql_Query2_Var('node');
-            $queryOptionalCoke->addTriple($this->_instances->getResourceVar(), $latProperty, $latVar);
-            $queryOptionalCoke->addTriple($this->_instances->getResourceVar(), $longProperty, $longVar);
+            $queryOptionalCoke->addTriple(
+                $this->_instances->getResourceVar(), $latProperty, $latVar
+            );
+            $queryOptionalCoke->addTriple(
+                $this->_instances->getResourceVar(), $longProperty, $longVar
+            );
             $queryOptionalPepsi->addTriple(
                 $this->_instances->getResourceVar(),
                 new Erfurt_Sparql_Query2_Var('pred'),
@@ -388,8 +403,12 @@ class MapController extends OntoWiki_Controller_Component
                         ?node <' . $latProperty . '> ?lat;
                     <' . $longProperty . '> ?long.
                 }';
-            $this->_owApp->logger->debug('MapComponent/_getResources direct query "' . $directQueryString . '".');
-            $this->_owApp->logger->debug('MapComponent/_getResources indirect query "' . $indireQueryString . '".');
+            $this->_owApp->logger->debug(
+                'MapComponent/_getResources direct query "' . $directQueryString . '".'
+            );
+            $this->_owApp->logger->debug(
+                'MapComponent/_getResources indirect query "' . $indireQueryString . '".'
+            );
             $queryDirect = Erfurt_Sparql_SimpleQuery::initWithString($directQueryString);
             $queryIndire = Erfurt_Sparql_SimpleQuery::initWithString($indireQueryString);
 
@@ -412,9 +431,8 @@ class MapController extends OntoWiki_Controller_Component
      * This function has many code duplicats, needs a rework.
      * @return array {"top" (max. lat.), "right"  (max. long.), "bottom" (min. lat.), "left" (min. long.)}
      */
-    private function _getMaxExtent ()
+    private function _getMaxExtent()
     {
-
         if ($this->_resources === null) {
             $this->_getResources();
         }
@@ -436,7 +454,7 @@ class MapController extends OntoWiki_Controller_Component
             }
         }
 
-        if (count($lat) > 0 AND count($long) > 0) {
+        if (count($lat) > 0 && count($long) > 0) {
             $return = array(
                     "top"    => max($lat),
                     "right"  => max($long),
@@ -455,7 +473,9 @@ class MapController extends OntoWiki_Controller_Component
                     );
         }
 
-        $this->_owApp->logger->debug('MapComponent/_getMaxExtent: extent: ' . var_export($return, true));
+        $this->_owApp->logger->debug(
+            'MapComponent/_getMaxExtent: extent: ' . var_export($return, true)
+        );
 
         return $return;
     }
@@ -497,4 +517,3 @@ class MapController extends OntoWiki_Controller_Component
         }
     }
 }
-

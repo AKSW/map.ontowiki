@@ -1,7 +1,5 @@
 <?php
 
-require_once $this->_componentRoot.'classes/Cluster.php';
-
 /**
  * The Clusterer object controlls the creation of the clusters on the map
  *
@@ -46,9 +44,9 @@ class Clusterer
     private $_resultingMarkers = array();
 
     /**
-     * This is the constructor for a clusterer, which manages the creation on 
+     * This is the constructor for a clusterer, which manages the creation on
      * clusters
-     * @param $gridCount vertical count of cells, regulates the fineness of the 
+     * @param $gridCount vertical count of cells, regulates the fineness of the
      * grid layed over the map
      * @param $maxVisibleMarkers stay unclustered in cells which contains a less
      * or equal count of markers to this value
@@ -97,15 +95,17 @@ class Clusterer
     }
 
     /**
-     * The gridCount tells us, how many squares should be between the left and 
-     * the right border of the viewArea the amount of the squares betweed top 
+     * The gridCount tells us, how many squares should be between the left and
+     * the right border of the viewArea the amount of the squares betweed top
      * and bottom will be calculated relatively
      * @param $gridCount vertical count of cells, regulates the fineness of the
      * grid layed over the map
      */
     public function setGridSize($gridCount)
     {
-        if ($gridCount == 0) $gridCount = 1;
+        if ($gridCount == 0) {
+            $gridCount = 1;
+        }
         $this->_gridCount = $gridCount;
     }
 
@@ -133,7 +133,7 @@ class Clusterer
         /**
          * Just a constraint
          */
-        if (false && ($latInc > 0) and ($lonInc > 0)) {
+        if (false && ($latInc > 0) && ($lonInc > 0)) {
 
             /**
              * Iterate each cell
@@ -159,7 +159,7 @@ class Clusterer
                     /**
                      * Check if the dateline is in this cell and tell this to the cluster.
                      */
-                    $cluster->setWithDateLine(($lon > ((($lon+$lonInc)<180)?($lon+$lonInc):(($lon+$lonInc)-360))));
+                    $cluster->setWithDateLine(($lon > ((($lon + $lonInc) < 180) ? ($lon + $lonInc) : (($lon + $lonInc) - 360))));
 
                     /**
                      * Iterate all markers
@@ -169,9 +169,8 @@ class Clusterer
                         /**
                          * Check if the marker is already in a cluster and if it is in the current cell
                          */
-                        if (
-                            (!$this->_markers[$i]->getInCluster())
-                             AND
+                        if ((!$this->_markers[$i]->getInCluster())
+                            &&
                             $this->isInViewArea(
                                 $this->_markers[$i],
                                 array(
@@ -214,10 +213,11 @@ class Clusterer
 
         for ($i = 0; $i < count($this->_markers); $i++) {
             if (!$this->_markers[$i]->getInCluster()) {
-                for ($j = $i+1; $j < count($this->_markers); $j++) {
+                for ($j = $i + 1; $j < count($this->_markers); $j++) {
                     if (!$this->_markers[$j]->getInCluster()) {
                         if ($this->_markers[$i]->getLon() == $this->_markers[$j]->getLon()
-                                && $this->_markers[$i]->getLat() == $this->_markers[$j]->getLat()) {
+                            && $this->_markers[$i]->getLat() == $this->_markers[$j]->getLat()
+                        ) {
                             $cluster = new Cluster($this->_viewArea);
                             if (!$this->_markers[$i]->getInCluster()) {
                                 $cluster->addMarker($this->_markers[$i]);
@@ -289,4 +289,3 @@ class Clusterer
         );
     }
 }
-

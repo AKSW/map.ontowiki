@@ -1,9 +1,5 @@
 <?php
 
-require_once $this->_componentRoot.'classes/Marker.php';
-require_once $this->_componentRoot.'classes/Clusterer.php';
-require_once $this->_componentRoot.'classes/GeoCoder.php';
-
 /**
  * MarkerManager-Class of the OW MapPlugin
  *
@@ -20,7 +16,7 @@ class MarkerManager
     private $_model;
 
     /**
-     * Maybe we should put the createMarkers() and/or createEdges() function 
+     * Maybe we should put the createMarkers() and/or createEdges() function
      * into the constructor or call them from the constructor.
      * @param $model    the URI to the actual selected model
      * @param $config
@@ -39,7 +35,7 @@ class MarkerManager
         foreach ($places as $p){
         // get all icons we can find, we dont distinguish between instance and class
         $query = new Erfurt_Sparql_SimpleQuery();
-        $query->setProloguePart('SELECT ?instance ?icon');
+        $query->setSelectClause('SELECT ?instance ?icon');
         $query->addFrom($p);
         $query->setWherePart('WHERE { ?instance <http://xmlns.com/foaf/0.1/depiction> ?icon }');
         $endpoint = new Erfurt_Sparql_Endpoint_Default($this->config);
@@ -90,22 +86,21 @@ class MarkerManager
         $markersVisible = array();
         for ($i = 0; $i < count($this->_markers); $i++) {
             if (
-                    $this->_markers[$i]->getLat() < $viewArea['top'] AND
-                    $this->_markers[$i]->getLat() > $viewArea['bottom'] AND
+                $this->_markers[$i]->getLat() < $viewArea['top'] &&
+                $this->_markers[$i]->getLat() > $viewArea['bottom'] &&
+                (
                     (
-                     (
-                      $this->_markers[$i]->getLon() < $viewArea['right'] AND
-                      $this->_markers[$i]->getLon() > $viewArea['left']
-                     ) OR
-                     (
-                      $viewArea['left'] > $viewArea['right'] AND
-                      (
-                       $this->_markers[$i]->getLon() < $viewArea['right'] OR
-                       $this->_markers[$i]->getLon() > $viewArea['left']
-                      )
-                     )
+                        $this->_markers[$i]->getLon() < $viewArea['right'] &&
+                        $this->_markers[$i]->getLon() > $viewArea['left']
+                    ) || (
+                        $viewArea['left'] > $viewArea['right'] &&
+                        (
+                            $this->_markers[$i]->getLon() < $viewArea['right'] ||
+                            $this->_markers[$i]->getLon() > $viewArea['left']
+                        )
                     )
-              ) {
+                )
+            ) {
                 $markersVisible[] = &$this->_markers[$i];
             }
         }
@@ -116,7 +111,7 @@ class MarkerManager
          */
         if ($clusterOn) {
             /**
-             * Instantiate a new Clusterer object 
+             * Instantiate a new Clusterer object
              */
             $clusterer = new Clusterer($clustGridCount, $clustMaxMarkers);
             $clusterer->setViewArea($viewArea);
@@ -157,8 +152,7 @@ class MarkerManager
             // is $uri a instance ?
             if (0 != count($rs) && 0 == count($rsInst) && 0 == count($rsSub)) {
                 // display one instance
-                $instQr =
-                    'SELECT * WHERE {'
+                $instQr = 'SELECT * WHERE {'
                     . ' OPTIONAL{ <' . $uri . '> <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long. }'
                     . ' OPTIONAL{ <' . $uri . '> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat. }'
                     . ' <' . $uri . '> <http://www.w3.org/2000/01/rdf-schema#label> ?label;'
@@ -173,8 +167,7 @@ class MarkerManager
                 // checked for further subclasses
                 for ( $i = 0; $i < sizeof($uriList); $i++ ) {
                     $checkUri = $uriList[$i];
-                    $subSearch =
-                        'SELECT * WHERE {'
+                    $subSearch = 'SELECT * WHERE {'
                         . ' ?subclass <http://www.w3.org/2000/01/rdf-schema#subClassOf>  <' . $checkUri . '>'
                         . '}';
                     $nextSubclass = $this->_model->sparqlQuery($subSearch);
@@ -192,14 +185,13 @@ class MarkerManager
                         PREFIX wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
                         SELECT * WHERE { ?inst <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <'. $uri .'>.
                             ?inst <http://www.w3.org/2000/01/rdf-schema#label> ?label.
-                                ?inst <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?class 
+                                ?inst <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?class
                                 OPTIONAL{ ?inst wgs84_pos:long ?long } OPTIONAL{ ?inst wgs84_pos:lat ?lat } }';
                     $output[] = $instances;
                 }
             }
         } else {// will give us all instances from the active model(knowledgbase)
-            $instances =
-                "SELECT * WHERE { ?inst <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long;
+            $instances = "SELECT * WHERE { ?inst <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long;
             <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat;
             <http://www.w3.org/2000/01/rdf-schema#label> ?label;
             <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?class.}";
@@ -283,10 +275,11 @@ class MarkerManager
             }
 
             // Find maximum difference in longitude between two adjacent markers
-            $max = 0; $maxIndex = 0;
+            $max = 0;
+$maxIndex = 0;
             for ($i = 0; $i < count($markersSorted) - 1; $i++) {
-                if ($markersSorted[$i+1]->getLon() - $markersSorted[$i]->getLon() > $max) {
-                    $max = $markersSorted[$i+1]->getLon() - $markersSorted[$i]->getLon();
+                if ($markersSorted[$i + 1]->getLon() - $markersSorted[$i]->getLon() > $max) {
+                    $max = $markersSorted[$i + 1]->getLon() - $markersSorted[$i]->getLon();
                     $maxIndex = $i;
                 }
             }
@@ -304,7 +297,7 @@ class MarkerManager
                 $diffLon = $right - $left;
             } else {
                 $right = $markersSorted[$maxIndex]->getLon();
-                $left = $markersSorted[$maxIndex+1]->getLon();
+                $left = $markersSorted[$maxIndex + 1]->getLon();
                 $centerLon = ($left + $right + 360) / 2;
                 while ( $centerLon > 180) {
                     $centerLon -= 360;

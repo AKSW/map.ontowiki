@@ -56,7 +56,7 @@ class Marker
     }
 
     /**
-     * Sets the _onMap-attribute, which indicates whether the marker is already 
+     * Sets the _onMap-attribute, which indicates whether the marker is already
      * added to the map.
      * @param $onMapIn indicates whether the marker is already added to the map
      */
@@ -66,7 +66,7 @@ class Marker
     }
 
     /**
-     * Gets the _onMap-attribute, which indicates whether the marker is already 
+     * Gets the _onMap-attribute, which indicates whether the marker is already
      * added to the map.
      * @return marker is already added to the map
      */
@@ -76,9 +76,9 @@ class Marker
     }
 
     /**
-     * Sets the _inCluster-attribute, which indicates whether the marker is 
+     * Sets the _inCluster-attribute, which indicates whether the marker is
      * contained in a cluster.
-     * @param $inClusterIn indicates whether the marker is contained in a 
+     * @param $inClusterIn indicates whether the marker is contained in a
      * cluster
      */
     public function setInCluster($inClusterIn)
@@ -87,7 +87,7 @@ class Marker
     }
 
     /**
-     * Gets the _inCluster-attribute, which indicates whether the marker is 
+     * Gets the _inCluster-attribute, which indicates whether the marker is
      * contained in a cluster.
      * @return marker is contained in a cluster
      */

@@ -1,7 +1,5 @@
 <?php
 
-require_once $this->_componentRoot.'classes/Marker.php';
-
 /**
  * Cluster-Class of the OW MapPlugin
  *
@@ -50,7 +48,7 @@ class Cluster extends Marker
     }
 
     /**
-     * Destructor of a Cluster object. Sets the inCluster-attribute of the 
+     * Destructor of a Cluster object. Sets the inCluster-attribute of the
      * contained markers to false.
      */
     public function __destruct()
@@ -84,7 +82,6 @@ class Cluster extends Marker
      */
     public function createLonLat($overwrite = true)
     {
-
         /**
          * Check if the longitude and latitude is already set.
          */

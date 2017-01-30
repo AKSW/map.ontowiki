@@ -69,7 +69,7 @@ class MapHelper extends OntoWiki_Component_Helper
      *
      * @return boolean true if it should be shown, false if not
      */
-    public function shouldShow ()
+    public function shouldShow()
     {
         $this->_owApp->logger->debug('shouldShow Helper');
 

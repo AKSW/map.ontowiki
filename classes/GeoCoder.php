@@ -1,9 +1,7 @@
 <?php
 
-require_once $this->_componentRoot . 'classes/Marker.php';
-
 /**
- * This Class finds a longitude and latitude for markers, which have no 
+ * This Class finds a longitude and latitude for markers, which have no
  * explicit logitude and latitude attribute
  *
  * TODO Caching!!!
@@ -25,10 +23,10 @@ class GeoCoder
      */
     private $_model;
 
-    /** 
+    /**
      * Constructor of the geocoder
      */
-    public function __construct ($model)
+    public function __construct($model)
     {
         $this->_model = $model;
     }
@@ -37,18 +35,18 @@ class GeoCoder
      * Set the value of maximum recursion depth for indirect geoCoding
      * @param $depth the new value for maximum recursion depth
      */
-    public function setMaxIndirectDepth ($depth)
+    public function setMaxIndirectDepth($depth)
     {
         $this->_maxIndirectDepth = $depth;
     }
 
     /**
-     * iterates trough all given instances, tries first direct geocoding, if it 
+     * iterates trough all given instances, tries first direct geocoding, if it
      * refuses, it does indirect geocoding
      * @param $marker
      * @return boolean
      */
-    public function geoCode ($marker)
+    public function geoCode($marker)
     {
         if ($this->directGeoCode($marker)) {
             return true;
@@ -69,7 +67,7 @@ class GeoCoder
      * @param $uri
      * @return boolean
      */
-    private function directGeoCode ($marker, $uri = null)
+    private function directGeoCode($marker, $uri = null)
     {
         //TODO test, if the marker has a property like "isin" or something like that
         /**
@@ -134,7 +132,7 @@ class GeoCoder
      *        a timestamp which will be tested if it is older than a max time.)
      * @return boolean
      */
-    private function indirectGeoCode ($marker, $uri = null, $depth = 0)
+    private function indirectGeoCode($marker, $uri = null, $depth = 0)
     {
         if ($uri == null) {
             $uri = $marker->getUri();
@@ -146,8 +144,8 @@ class GeoCoder
             $qr = "SELECT * WHERE {
                 { <" . $uri . "> <http://3ba.se/conferences/inConjunctionWith> ?inConjunctionWith}
                 UNION
-                { <" . $uri . "> 
-                    <" . $longProperties[0] . "> ?lon; 
+                { <" . $uri . ">
+                    <" . $longProperties[0] . "> ?lon;
                     <" . $latProperties[0] . "> ?lat}
 
             }";
@@ -155,7 +153,7 @@ class GeoCoder
             $instance = $resource[0];
 
             if (
-                get_class($instance['lon']) == "Erfurt_Rdfs_Literal_Default" AND
+                get_class($instance['lon']) == "Erfurt_Rdfs_Literal_Default" A&&ND
                 get_class($instance['lat']) == "Erfurt_Rdfs_Literal_Default"
             ) {
                 $marker->setLon($instance['lon']->getLabel());
